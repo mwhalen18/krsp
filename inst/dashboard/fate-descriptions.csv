@@ -1,0 +1,12 @@
+Fate,Description,On map
+1,Same midden as last census,Y
+2,Different midden from last census,Y
+3,Floater in last census and floater in this census,N
+7,"Juvenile sharing mother's midden",N
+8,UTS,Y
+14,"New squirrel, floater",N
+15,Squirrel defending a new midden,Y
+16,New squirrel defending a new midden,Y
+17,"Previously defended a midden, currently a floater",N
+18,"New squirrel, defending a midden",Y
+19,Secondary midden,Y

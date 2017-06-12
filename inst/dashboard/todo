@@ -1,0 +1,11 @@
+1. DONE: however, I've taken a different approach here. I've included the shiny app within the krsp package. So, once you update that pacakge, you can just run krsp_dashboard(), no need to download the shiny app separately. In addition, this functions takes parameters to set the database connection. krsp_dashboard() or krsp_dashboard(location = "local") connects to krsp on localhost as root user with no password. krsp_dashboard(location = "camp") connects to krsp at 192.168.1.104 as user "squirreler" with no password. You can also specify the database, host, username, and password directly to allow full flexibility. Finally, if pool isn't installed an error will be raised saying to run devtools::install_github('rstudio/pool'). Let me know if this solution works for you.
+2. DONE: some collars will still show up at NA though because no valid frequency was entered.
+3. DONE
+4. DONE: I don't think it's wise to have people looking through the database to find litter IDs. Instead I added the option to look up by year, squirrel ID, and litter number. It looks up the weights as well as the n1 date, last pregnant date, and first lactating date. If either last pregnant date or first lactiting date are missing, the checkboxes are unchecked.
+5. DONE: however, note that I wasn't able to get the popups working for the midden points. A limitation is that I can either have the popups working and have the rattle and midden points look the same or not have popups and have hollow middens and solid rattle points. I think the latter is better.
+6. Yes, rattles from behaviour and rattles on release from trapping.
+7. It already indicates both the date of the rattle and the last trap date. Should I remove last trapped date?
+8. DONE: can now filter errors to within a range of dates
+9. DONE
+10. DONE
+11.  Possible addition 2 - related to the point above.  Folks thought it would be helpful to have a map of all middens from the last census where the colour of the circle was determined by the census fate from the current census.  AS above the ‘current census’ would need to be indicated by the user.  All points would be empty at the start of the census and they could then see which of the middens from the last census they didn’t have an owner for yet.  This same code would be helpful for point #5 above.

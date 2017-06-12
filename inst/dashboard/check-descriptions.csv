@@ -1,0 +1,22 @@
+Category,Check,Description
+Trapping,check_trapping_loc,"locs should conform to the standard format for reflos, e.g. A.5, 22.0, or -1.5"
+Trapping,check_trapping_colours,check for valid colours
+Trapping,check_trapping_tags,"check for valid tags, i.e. a letter followed by 4 numbers"
+Trapping,check_trapping_weight,highlight records with suspicious bag or squirrel weights
+Trapping,check_trapping_collwt,"squirrels with collar fate of 2 (collar on), 3 (collar change), or 4 (collar removed) should have a collar weight of either 4 or 8g"
+Trapping,check_trapping_dna,"DNA vial numbers should be composed of the grid, followed by the 2 digit year, then 4 numbers, e.g. KL151234"
+Trapping,check_trapping_newdna,newly caught squirrels and squirrels with ripped tags in both ears (i.e. RIP/RIP) should have DNA
+Trapping,check_trapping_fate,all trapping records should have an associated fate
+Behaviour,check_behaviour_loc,"locs should conform to the standard format, e.g. A.1, 22.1, or -1.8"
+Behaviour,check_behaviour_mode,"the mode of the observation, i.e. how it was taken, should never be empty"
+Behaviour,check_behaviour_time,"highlight observations with suspicious times, i.e. those not between 6am and 10pm"
+Nests,check_nest_loc,"litter table locs should conform to the standard format, e.g. A.1, 22.1, or -1.8, and reference mom's midden"
+Nests,check_nest_n1loc,"N1 locs should conform to the standard format, e.g. A.1, 22.1, or -1.8"
+Nests,check_nest_n2loc,"N2 locs should conform to the standard format, e.g. A.1, 22.1, or -1.8"
+Nests,check_nest_dna,"juveniles should have 2 DNA vials with vial numbers composed of the grid, followed by the 2 digit year, then 4 numbers, e.g. KL151234"
+Nests,check_nest_weight,highlight records with suspicious N1 or N2 weights
+Nests,check_nest_notch,within a litter no two squirrels of the same sex should have the same notch combination
+Nests,check_nest_grid,grid associated with a litter should match the mother's grid
+Collars,check_collars_frequency,"trapping records with collar fate of 1 (new collar), 3 (collar change), 2 (collar on), or 4 (collar removed) should have a valid collar frequency"
+Collars,check_collars_rcnew,"squirrels with collar fate of 2 (collar on), 3 (collar change), or 4 (collar removed) should have associated new collar record"
+Collars,check_collars_rcoff,"squirrels that currently have no collar but previously had a collar, should have a record for a collar removal"
