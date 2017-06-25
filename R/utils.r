@@ -101,10 +101,12 @@ next_trap <- function(status, trap_date) {
   status <- as.character(status)
   days_forward <- c(18, 14, 7, 3,
                     18, 3,
-                    10, 10, 10)
+                    10, 10, 10,
+                    30, 30)
   names(days_forward) <- c("P0", "P1", "P2", "P3",
                            "Non-breeder", "LL",
-                           "Parturition", "N1", "N2")
+                           "Parturition", "N1", "N2",
+                           "A", "S")
   if (lubridate::is.Date(trap_date)) {
     to_trap <- trap_date + unname(days_forward[status])
     to_trap <- dplyr::coalesce(to_trap, trap_date)

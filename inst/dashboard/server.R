@@ -189,12 +189,20 @@ shinyServer(function(input, output, session) {
 
   # data
   progress <- eventReactive(input$submit_progress, {
-    kp(pool) %>%
-      krsp_progress(grid = input$grid_input_progress,
-                    year = input$year_input_progress,
-                    data = TRUE)
+    if (input$grid_input_progress == "All") {
+      kp(pool) %>%
+        krsp_progress(year = input$year_input_progress,
+                      sex = input$sex_input_progress,
+                      data = TRUE)
+    } else {
+      kp(pool) %>%
+        krsp_progress(grid = input$grid_input_progress,
+                      year = input$year_input_progress,
+                      sex = input$sex_input_progress,
+                      data = TRUE)
+    }
   })
-
+  
   # data table
   output$table_progress = DT::renderDataTable(
     if (!is.null(progress())) krsp:::progress_datatable(progress()) else NULL,

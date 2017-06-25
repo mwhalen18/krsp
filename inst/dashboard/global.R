@@ -88,7 +88,10 @@ progress_help <- div(
     "litter, but a record for this second litter has not yet been entered ",
     "into the litter table, then there will be a row with Litter Status = ",
     "N2 and Trap Status = P3. To avoid this, the field crew should ",
-    "immediately create a new litter record once a squirrel is pregnant.")
+    "immediately create a new litter record once a squirrel is pregnant."),
+  p(strong("Male"), " progress can optionally be displayed. ", strong("Status"),
+    " for males will be either 'S' (scrotal) or 'A' (abdominal). For all ",
+    "males, the next trap date is set to 30 days after the previous trap date.")
 )
 
 # help for the census tool
