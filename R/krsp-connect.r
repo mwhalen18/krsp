@@ -26,12 +26,26 @@
 krsp_connect <- function(dbname = "krsp", host = "localhost", port = 0L,
                          user = "root", password = "", group = NULL, ...) {
   if (is.null(group)) {
-    con <- src_mysql(dbname = dbname, host = host, port = port,
-                     user = user, password = password, ...)
+    con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(),
+      dbname = dbname, host = host, port = port, 
+      user = user, password = password, ...))
+    
+    # con <- src_mysql(dbname = dbname, host = host, port = port,
+    #                  user = user, password = password, ...)
   } else {
-    con <- src_mysql(group = group, dbname = NULL, host = NULL, password = NULL,
-                     user = NULL, ...)
+    con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(),
+      group = group, dbname = NULL, host = NULL, password = NULL,
+      user = NULL, ...))
+    # con <- src_mysql(group = group, dbname = NULL, host = NULL, password = NULL,
+    #                  user = NULL, ...)
   }
   class(con) <- c("krsp", class(con))
   con
 }
+
+
+con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(), 
+                      host = "localhost",
+                      dbname = "krsp",
+                      user = "root",
+                      password = ""))

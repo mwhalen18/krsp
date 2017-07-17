@@ -19,7 +19,7 @@ krsp_litter_lookup <- function(con, year, squirrel_id, ln) {
 
 #' @export
 krsp_litter_lookup.krsp <- function(con, year, squirrel_id, ln) {
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year, single = TRUE),
               is_integer(squirrel_id), length(squirrel_id) == 1,
               is_integer(ln), length(ln) == 1, ln < 5)

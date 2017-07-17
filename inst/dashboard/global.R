@@ -10,7 +10,7 @@ library(tidyr)
 library(readr)
 
 # set connection parameters for calling directly
-if (!exists(".dbcon")) {
+if (!exists(".dbc on")) {
   .dbcon <- list(
     dbname = "krsp",
     host = "localhost",
@@ -18,7 +18,7 @@ if (!exists(".dbcon")) {
     password = "")
 }
 
-pool <- dbPool(
+pool <- dbPool( 
   drv = RMySQL::MySQL(),
   dbname = .dbcon$dbname,
   host = .dbcon$host,

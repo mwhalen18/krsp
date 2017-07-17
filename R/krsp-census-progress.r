@@ -29,7 +29,7 @@ krsp_census_progress <- function(con, grid, year, census) {
 krsp_census_progress.krsp <- function(con, grid, year,
                                       census = c("august", "may")) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year, single = TRUE), year > 2012,
               valid_grid(grid, single = TRUE))
   census <- match.arg(census)

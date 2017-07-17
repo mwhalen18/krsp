@@ -31,7 +31,7 @@ krsp_censusmap <- function(con, grid, year, census, data) {
 krsp_censusmap.krsp <- function(con, grid, year, census = c("august", "may"),
                                 data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year, single = TRUE), year > 2015,
               valid_grid(grid, single = TRUE),
               assertthat::is.flag(data))

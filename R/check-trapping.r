@@ -69,7 +69,7 @@ check_trapping <- function(con, grid, year, observer) {
 #' @export
 check_trapping.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -127,7 +127,7 @@ check_trapping_loc <- function(con, grid, year, observer, reflo = TRUE) {
 #' @export
 check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -218,7 +218,7 @@ check_trapping_colours <- function(con, grid, year, observer) {
 #' @export
 check_trapping_colours.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -315,7 +315,7 @@ check_trapping_tags <- function(con, grid, year, observer) {
 #' @export
 check_trapping_tags.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -414,7 +414,7 @@ check_trapping_weight <- function(con, grid, year, observer,
 check_trapping_weight.krsp <- function(con, grid, year, observer,
                                        missing_wt = FALSE) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -513,7 +513,7 @@ check_trapping_collwt <- function(con, grid, year, observer) {
 #' @export
 check_trapping_collwt.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -604,7 +604,7 @@ check_trapping_dna <- function(con, grid, year, observer) {
 #' @export
 check_trapping_dna.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -693,7 +693,7 @@ check_trapping_newdna <- function(con, grid, year, observer) {
 #' @export
 check_trapping_newdna.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -784,7 +784,7 @@ check_trapping_fate <- function(con, grid, year, observer) {
 #' @export
 check_trapping_fate.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),

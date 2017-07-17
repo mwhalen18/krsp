@@ -1,6 +1,6 @@
 Package: krsp
 Title: Working with the Kluane Red Squirrel Project Database
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
   person("Matthew", "Strimas-Mackey", email="mstrimas@gmail.com", role = c("aut", "cre")),
   person("Andrew", "McAdam", email="amcadam@uoguelph.ca", role = c("aut", "cph"))
@@ -11,24 +11,25 @@ Description: This package is designed to help user bring data from the KRSP
     functions to ensure consistency.
 Depends:
     R (>= 3.1.2),
-    dplyr
+    dplyr (>= 0.7.1)
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1
 Imports: assertthat,
     ggvis,
     DBI,
+    RMySQL,
     lubridate,
     lazyeval,
     DT,
     htmlwidgets,
     tidyr,
     stringr,
-    shiny
+    shiny,
+    dbplyr
 URL: https://github.com/mstrimas/krsp
 BugReports: https://github.com/mstrimas/krsp/issues
 Suggests: knitr,
     rmarkdown,
-    RMySQL,
-    pool
+    pool (>= 0.1.0)
 VignetteBuilder: knitr

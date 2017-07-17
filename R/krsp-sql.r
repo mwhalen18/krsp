@@ -13,7 +13,7 @@
 #' krsp_sql(con, "SELECT COUNT(*) AS n_squirrels FROM squirrel")
 krsp_sql <- function(con, sql) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               assertthat::is.string(sql))
 
   # only SELECT queries are permitted

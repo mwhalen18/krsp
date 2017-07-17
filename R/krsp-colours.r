@@ -26,7 +26,7 @@ krsp_colours <- function(con, grid, year) {
 #' @export
 krsp_colours.krsp <- function(con, grid, year = current_year()) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_grid(grid, single = TRUE),
               valid_year(year, single = TRUE))
   year_arg <- as.integer(year)
@@ -86,10 +86,10 @@ krsp_colours.krsp <- function(con, grid, year = current_year()) {
     select_(~ -id, ~ -ft)
   # combine litter and trapping data
   trap_lit <- bind_rows(juveniles, recent) %>%
-    arrange_(~ desc(date)) %>%
     # only keep most recent between trapping and litter
     group_by_("squirrel_id") %>%
-    filter_(~ row_number(desc(date)) == 1) %>%
+    arrange_(~ desc(date)) %>%
+    filter_(~ row_number() == 1) %>%
     ungroup()
   if (!is.data.frame(trap_lit) | nrow(trap_lit) == 0) {
     return(as.tbl(data.frame(

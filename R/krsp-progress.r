@@ -39,7 +39,7 @@ krsp_progress <- function(con, grid, year, sex = c("F", "M", "Both"),
 krsp_progress.krsp <- function(con, grid, year = current_year(), 
                                sex = c("F", "M", "Both"), data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year, single = TRUE),
               missing(grid) || valid_grid(grid))
   

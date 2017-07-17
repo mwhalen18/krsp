@@ -21,7 +21,7 @@ krsp_needs_br <- function(con, year) {
 #' @export
 krsp_needs_br.krsp <- function(con, year = current_year()) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year))
 
   year <- as.integer(year)

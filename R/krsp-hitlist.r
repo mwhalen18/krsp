@@ -23,7 +23,7 @@ krsp_hitlist <- function(con, year) {
 #' @export
 krsp_hitlist.krsp <- function(con, year = current_year()) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               valid_year(year, single = TRUE))
 
   year <- as.integer(year)

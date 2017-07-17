@@ -37,7 +37,7 @@ check_collars <- function(con, grid, year) {
 #' @export
 check_collars.krsp <- function(con, grid, year = current_year()) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               valid_year(year, single = TRUE))
   year_arg <- as.integer(year)

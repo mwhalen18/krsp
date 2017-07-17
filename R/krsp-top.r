@@ -21,7 +21,7 @@ krsp_top <- function(con, year) {
 #' @export
 krsp_top.krsp <- function(con, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(year) || valid_year(year, single = TRUE))
   if (!missing(year)) {
     year_arg <- as.integer(year)

@@ -14,6 +14,6 @@ krsp_tables <- function(con) {
 #' @export
 krsp_tables.krsp <- function(con) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"))
+  assert_that(inherits(con, "src_dbi"))
   src_tbls(con)
 }

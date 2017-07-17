@@ -58,7 +58,7 @@ check_nest <- function(con, grid, year) {
 #' @export
 check_nest.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -111,7 +111,7 @@ check_nest_loc <- function(con, grid, year) {
 #' @export
 check_nest_loc.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -174,7 +174,7 @@ check_nest_n1loc <- function(con, grid, year) {
 #' @export
 check_nest_n1loc.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -237,7 +237,7 @@ check_nest_n2loc <- function(con, grid, year) {
 #' @export
 check_nest_n2loc.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -300,7 +300,7 @@ check_nest_weight <- function(con, grid, year) {
 #' @export
 check_nest_weight.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -378,7 +378,7 @@ check_nest_dna <- function(con, grid, year) {
 #' @export
 check_nest_dna.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -450,7 +450,7 @@ check_nest_notch <- function(con, grid, year) {
 #' @export
 check_nest_notch.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -525,7 +525,7 @@ check_nest_grid <- function(con, grid, year) {
 #' @export
 check_nest_grid.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 

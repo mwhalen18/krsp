@@ -22,9 +22,7 @@ krsp_pool <- function(pool) {
   if (!requireNamespace("pool", quietly = TRUE)) {
     stop("pool package required", call. = FALSE)
   }
-  con <- pool::src_pool(pool)
+  con <- dbplyr::src_dbi(pool::poolCheckout(pool))
   class(con) <- c("krsp", class(con))
   return(con)
 }
-
-

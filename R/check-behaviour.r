@@ -42,7 +42,7 @@ check_behaviour <- function(con, grid, year, observer) {
 #' @export
 check_behaviour.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -79,7 +79,7 @@ check_behaviour_loc <- function(con, grid, year, observer) {
 #' @export
 check_behaviour_loc.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -160,7 +160,7 @@ check_behaviour_mode <- function(con, grid, year, observer) {
 #' @export
 check_behaviour_mode.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -240,7 +240,7 @@ check_behaviour_time <- function(con, grid, year, observer) {
 #' @export
 check_behaviour_time.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),

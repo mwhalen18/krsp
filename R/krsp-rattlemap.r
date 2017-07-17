@@ -52,7 +52,7 @@ krsp_rattlemap.krsp <- function(con, grid, year, date_range,
                                 middens = c("none", "august", "may"),
                                 data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_mysql"),
+  assert_that(inherits(con, "src_dbi"),
               missing(year) || valid_year(year, single = TRUE),
               missing(date_range) || length(date_range) == 2,
               missing(locx_range) || length(locx_range) == 2,
