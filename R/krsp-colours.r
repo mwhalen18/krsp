@@ -17,8 +17,10 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_colours(con, grid = "KL", year = 2014)
+#' }
 krsp_colours <- function(con, grid, year) {
   UseMethod("krsp_colours")
 }

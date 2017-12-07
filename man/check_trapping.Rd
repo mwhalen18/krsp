@@ -88,6 +88,7 @@ The following checks have been implemented:
 }
 
 \examples{
+\dontrun{
 con <- krsp_connect()
 # run individual checks
 check_trapping_loc(con, grid = "AG", year = 2015)
@@ -102,4 +103,5 @@ check_trapping_fate(con, year = 2015)
 # or perform them all at once
 check_trapping(con, year = 2014) \%>\%
   count(check)
+}
 }

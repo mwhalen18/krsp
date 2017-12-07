@@ -16,6 +16,8 @@ List of tables in KRSP database
 List tables in the KRSP database
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_tables(con)
+}
 }

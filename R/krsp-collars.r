@@ -11,8 +11,10 @@
 #' @return A data frame of all squirrels with collars on.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_collars(con, grid = "JO", year = 2014)
+#' }
 krsp_collars <- function(con, grid, year) {
   UseMethod("krsp_collars")
 }

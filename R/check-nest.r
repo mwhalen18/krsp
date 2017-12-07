@@ -39,6 +39,7 @@
 #' @return A data frame of records that failed the checks.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' # run individual checks
 #' check_nest_loc(con, grid = "AG")
@@ -51,6 +52,7 @@
 #' # or perform them all at once
 #' check_nest(con, year = 2012) %>%
 #'   count(check)
+#' }
 check_nest <- function(con, grid, year) {
   UseMethod("check_nest")
 }

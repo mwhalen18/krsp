@@ -41,6 +41,8 @@ The following checks have been implemented:
 }
 
 \examples{
+\dontrun{
 con <- krsp_connect()
 check_collars(con, grid = "KL", year = 2014)
+}
 }

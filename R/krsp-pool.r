@@ -10,6 +10,7 @@
 #' @return A connection to the krsp database for use with \code{dplyr}.
 #' @export
 #' @examples
+#' \dontrun{
 #' pool <- pool::dbPool(
 #'   drv = RMySQL::MySQL(),
 #'   dbname = "krsp",
@@ -18,6 +19,7 @@
 #'   password = ""
 #' )
 #' krsp_pool(pool)
+#' }
 krsp_pool <- function(pool) {
   if (!requireNamespace("pool", quietly = TRUE)) {
     stop("pool package required", call. = FALSE)

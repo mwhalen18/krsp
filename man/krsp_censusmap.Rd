@@ -33,8 +33,10 @@ will be compared to the May census from that year, while a May census will be
 compared to the previous year's August census.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_censusmap(con, "JO", 2016, "may", data = TRUE) \%>\%
   head()
 krsp_censusmap(con, "KL", 2016, "august")
+}
 }

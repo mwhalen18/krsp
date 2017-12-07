@@ -18,9 +18,11 @@
 #' @return A data frame of squirrel seen since the last census.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_census_progress(con, "JO", 2014, "may") %>%
 #'   head()
+#' }
 krsp_census_progress <- function(con, grid, year, census) {
   UseMethod("krsp_census_progress")
 }

@@ -19,9 +19,11 @@ A data frame of squirrelers and number of trapping records, behaviour
 Generate a list of the top squirrelers based on a variety of metrics.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_top(con, year = 2014) \%>\%
   head()
 krsp_top(con) \%>\%
   head()
+}
 }

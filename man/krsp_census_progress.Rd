@@ -31,7 +31,9 @@ August 15. If it's a May census that is being completed, then this function
 returns all squirrels seen up to May 15 of the given year.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_census_progress(con, "JO", 2014, "may") \%>\%
   head()
+}
 }

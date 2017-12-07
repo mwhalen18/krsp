@@ -21,8 +21,10 @@
 #' @return A connection to the krsp database for use with \code{dplyr}.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_tables(con)
+#' }
 krsp_connect <- function(dbname = "krsp", host = "localhost", port = 0L,
                          user = "root", password = "", group = NULL, ...) {
   if (is.null(group)) {
@@ -42,10 +44,3 @@ krsp_connect <- function(dbname = "krsp", host = "localhost", port = 0L,
   class(con) <- c("krsp", class(con))
   con
 }
-
-
-con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(), 
-                      host = "localhost",
-                      dbname = "krsp",
-                      user = "root",
-                      password = ""))

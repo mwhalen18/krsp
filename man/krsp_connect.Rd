@@ -35,6 +35,8 @@ much safer to store these authentication parameters in a my.cnf file. Consult
 the vignette for this package for further details.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_tables(con)
+}
 }

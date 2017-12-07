@@ -19,6 +19,7 @@ simultaneously. This wrapper function for \code{\link[pool]{src_pool}}
 returns a \code{krsp} database connection object from a pool.
 }
 \examples{
+\dontrun{
 pool <- pool::dbPool(
   drv = RMySQL::MySQL(),
   dbname = "krsp",
@@ -27,4 +28,5 @@ pool <- pool::dbPool(
   password = ""
 )
 krsp_pool(pool)
+}
 }

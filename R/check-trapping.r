@@ -48,6 +48,7 @@
 #' @return A data frame of records that failed the checks.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' # run individual checks
 #' check_trapping_loc(con, grid = "AG", year = 2015)
@@ -62,6 +63,7 @@
 #' # or perform them all at once
 #' check_trapping(con, year = 2014) %>%
 #'   count(check)
+#' }
 check_trapping <- function(con, grid, year, observer) {
   UseMethod("check_trapping")
 }

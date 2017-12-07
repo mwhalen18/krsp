@@ -27,6 +27,8 @@ Display a colour key based on the most recent trapping records for a given
 grid and year.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_colours(con, grid = "KL", year = 2014)
+}
 }

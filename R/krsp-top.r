@@ -9,11 +9,13 @@
 #'   observations, and collars.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_top(con, year = 2014) %>%
 #'   head()
 #' krsp_top(con) %>%
 #'   head()
+#' }
 krsp_top <- function(con, year) {
   UseMethod("krsp_top")
 }

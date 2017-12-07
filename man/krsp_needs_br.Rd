@@ -22,6 +22,8 @@ appear in the litter table and have a breeding status even if they did not
 breed in a given year.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_needs_br(con, 2015)
+}
 }

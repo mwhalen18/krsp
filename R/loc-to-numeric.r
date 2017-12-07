@@ -7,7 +7,9 @@
 #' @return Numeric vector of grid locations.
 #' @export
 #' @examples
+#' \dontrun{
 #' loc_to_numeric(c("A.1", "T.5", "-1.1", "5.0", "AAA"))
+#' }
 loc_to_numeric <- function(x) {
   # assertions on arguments
   assert_that(is.character(x) || is.numeric(x))

@@ -26,10 +26,12 @@
 #'   data frame is returned and nothing is plotted.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_progress(con, "JO", 2015, data = TRUE) %>%
 #'   head()
 #' krsp_progress(con, "KL", 2011)
+#' }
 krsp_progress <- function(con, grid, year, sex = c("F", "M", "Both"), 
                           data = FALSE) {
   UseMethod("krsp_progress")

@@ -14,8 +14,10 @@
 #'    converted to a data.frame.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_hitlist(con, 2016)
+#' }
 krsp_hitlist <- function(con, year) {
   UseMethod("krsp_hitlist")
 }

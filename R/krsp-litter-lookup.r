@@ -11,8 +11,10 @@
 #' @return A data frame of the juveniles in the given litter.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_litter_lookup(con, year = 2013, squirrel_id = 11059, ln = 1)
+#' }
 krsp_litter_lookup <- function(con, year, squirrel_id, ln) {
   UseMethod("krsp_litter_lookup")
 }

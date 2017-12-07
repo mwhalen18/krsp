@@ -24,6 +24,8 @@ to do list at the beginning of the season, i.e. the earliest breeders last
 year should be caught first this year.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_hitlist(con, 2016)
+}
 }

@@ -23,6 +23,8 @@ Lookup a litter based on year, squirrel ID, and litter number and return a
 data frame of the juveniles in that litter.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_litter_lookup(con, year = 2013, squirrel_id = 11059, ln = 1)
+}
 }

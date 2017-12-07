@@ -28,6 +28,7 @@
 #' @return A data frame of records that failed the checks.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' # run individual checks
 #' check_behaviour_time(con, grid = "AG", year = 2013)
@@ -35,6 +36,7 @@
 #' check_behaviour_mode(con, year = 2010:2012)
 #' # or perform them all at once
 #' check_behaviour(con, grid = "JO", year = 2012)
+#' }
 check_behaviour <- function(con, grid, year, observer) {
   UseMethod("check_behaviour")
 }

@@ -31,6 +31,7 @@
 #'   plotted.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_rattlemap(con, "JO", 2014, data = TRUE) %>%
 #'   head()
@@ -40,6 +41,7 @@
 #' # choose loc range
 #' krsp_rattlemap(con, "JO", 2010, locx_range = c("D", "H"),
 #'   locy_range = c(5, 10))
+#' }
 krsp_rattlemap <- function(con, grid, year, date_range,
                            locx_range, locy_range,
                            middens, data) {

@@ -10,7 +10,7 @@ library(tidyr)
 library(readr)
 
 # set connection parameters for calling directly
-if (!exists(".dbc on")) {
+if (!exists(".dbcon")) {
   .dbcon <- list(
     dbname = "krsp",
     host = "localhost",

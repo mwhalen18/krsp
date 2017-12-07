@@ -19,6 +19,8 @@ Run a pure SQL query on the KRSP database and return a data frame. To avoid
 accidentally changing the database, only \code{SELECT} queries are permitted.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_sql(con, "SELECT COUNT(*) AS n_squirrels FROM squirrel")
+}
 }

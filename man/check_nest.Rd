@@ -73,6 +73,7 @@ The following checks have been implemented:
 }
 
 \examples{
+\dontrun{
 con <- krsp_connect()
 # run individual checks
 check_nest_loc(con, grid = "AG")
@@ -85,4 +86,5 @@ check_nest_grid(con, year = 2006)
 # or perform them all at once
 check_nest(con, year = 2012) \%>\%
   count(check)
+}
 }

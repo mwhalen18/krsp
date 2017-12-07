@@ -22,6 +22,8 @@ is assumed to have a collar on if there is a record for a new radio collar (
 `radio = 1`), but no matching radio collar off record (`radio = 4`).
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_collars(con, grid = "JO", year = 2014)
+}
 }

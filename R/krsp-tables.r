@@ -5,8 +5,10 @@
 #' @return List of tables in KRSP database
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_tables(con)
+#' }
 krsp_tables <- function(con) {
   UseMethod("krsp_tables")
 }

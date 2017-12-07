@@ -28,8 +28,10 @@
 #' @return A data frame of records that failed the checks.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' check_collars(con, grid = "KL", year = 2014)
+#' }
 check_collars <- function(con, grid, year) {
   UseMethod("check_collars")
 }

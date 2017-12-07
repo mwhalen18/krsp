@@ -19,10 +19,12 @@
 #'   \code{data == TRUE}.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_censusmap(con, "JO", 2016, "may", data = TRUE) %>%
 #'   head()
 #' krsp_censusmap(con, "KL", 2016, "august")
+#' }
 krsp_censusmap <- function(con, grid, year, census, data) {
   UseMethod("krsp_censusmap")
 }

@@ -4,26 +4,28 @@
 \alias{krsp_progress}
 \title{Display seasonal data collection progress}
 \usage{
-krsp_progress(con, grid, year, data)
+krsp_progress(con, grid, year, sex = c("F", "M", "Both"), data = FALSE)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
 
-\item{grid}{character; a single grid to map}
+\item{grid}{character; one or more grids to search. Defaults to all grids.}
 
 \item{year}{integer; defaults to current year}
+
+\item{sex}{character; whether to return females, males, or both.}
 
 \item{data}{logical; if TRUE return data frame instead of plotting}
 }
 \value{
-Displays and returns a \code{ggvis} plot of seasonal workflow
-  progress for all females, unless \code{data} is TRUE, in which case a data
-  frame is returned and nothing is plotted.
+Displays and returns a \code{ggvis} plot of seasonal workflow 
+  progress for all squirrels, unless \code{data} is TRUE, in which case a
+  data frame is returned and nothing is plotted.
 }
 \description{
-Display an interactive visualization of data collection progress for the
-season. All adult females caught in the given year are inlcuded provided
-their most recent trapping record has fate 1-3.
+Display an interactive visualization of data collection progress for the 
+season. All adult females and males caught in the given year are inlcuded
+provided their most recent trapping record has fate 1-3.
 }
 \details{
 The status of a female is based on the most recent trapping record and the
@@ -34,10 +36,14 @@ status is Parturition, N1, or Completed if fieldBDate, date1, or tagDt fields
 in litter table are filled in, respectively. Finally, if litter table dates
 are empty, rep_con field in trapping record is used and status is P0, P1, P2,
 or P3 is assigned for rep_con = 1, 2, 3, 4, respectively.
+
+Males are assigned status "S" or "A" for scrotal or abdominal.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_progress(con, "JO", 2015, data = TRUE) \%>\%
   head()
 krsp_progress(con, "KL", 2011)
+}
 }

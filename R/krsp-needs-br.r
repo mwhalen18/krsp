@@ -12,8 +12,10 @@
 #'    information. Can be converted to a data.frame.
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_needs_br(con, 2015)
+#' }
 krsp_needs_br <- function(con, year) {
   UseMethod("krsp_needs_br")
 }

@@ -16,5 +16,7 @@ Numeric vector of grid locations.
 Convert alphanumeric grid locations to purely numeric ones, e.g. A.1 becomes 1.1.
 }
 \examples{
+\dontrun{
 loc_to_numeric(c("A.1", "T.5", "-1.1", "5.0", "AAA"))
+}
 }

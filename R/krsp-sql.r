@@ -9,8 +9,10 @@
 #' @return data.frame of query results
 #' @export
 #' @examples
+#' \dontrun{
 #' con <- krsp_connect()
 #' krsp_sql(con, "SELECT COUNT(*) AS n_squirrels FROM squirrel")
+#' }
 krsp_sql <- function(con, sql) {
   # assertions on arguments
   assert_that(inherits(con, "src_dbi"),

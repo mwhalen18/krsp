@@ -49,6 +49,7 @@ arguments, which is a vector of the from and to dates, respectively, both of
 which must be in the same year. If \code{date_range} is provided is ignored.
 }
 \examples{
+\dontrun{
 con <- krsp_connect()
 krsp_rattlemap(con, "JO", 2014, data = TRUE) \%>\%
   head()
@@ -58,4 +59,5 @@ krsp_rattlemap(con, "AG", date_range = c("2014-04-01", "2014-04-10"))
 # choose loc range
 krsp_rattlemap(con, "JO", 2010, locx_range = c("D", "H"),
   locy_range = c(5, 10))
+}
 }
