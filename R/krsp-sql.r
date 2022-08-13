@@ -15,7 +15,7 @@
 #' }
 krsp_sql <- function(con, sql) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               assertthat::is.string(sql))
 
   # only SELECT queries are permitted
@@ -24,5 +24,5 @@ krsp_sql <- function(con, sql) {
     stop("Only SELECT queries are permitted.")
   }
 
-  DBI::dbGetQuery(con$con, sql)
+  DBI::dbGetQuery(con, sql)
 }
