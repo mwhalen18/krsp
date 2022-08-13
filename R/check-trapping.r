@@ -64,14 +64,10 @@
 #' check_trapping(con, year = 2014) %>%
 #'   count(check)
 #' }
-check_trapping <- function(con, grid, year, observer) {
-  UseMethod("check_trapping")
-}
-
 #' @export
-check_trapping.krsp <- function(con, grid, year, observer) {
+check_trapping <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -116,20 +112,14 @@ check_trapping.krsp <- function(con, grid, year, observer) {
                       fate_check, stringsAsFactors = FALSE)
 
   # combine
-  as_data_frame(bind_rows(loc_check, colour_check, tag_check, weight_check,
+  tibble(bind_rows(loc_check, colour_check, tag_check, weight_check,
                           collwt_check, dna_check, newdna_check, fate_check))
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_loc <- function(con, grid, year, observer, reflo = TRUE) {
-  UseMethod("check_trapping_loc")
-}
-
-#' @export
-check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -145,9 +135,9 @@ check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(squirrel_id)) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      mutate(year =  year(date)) %>%
+      filter( !is.na(squirrel_id)) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -164,37 +154,37 @@ check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # find bad locs
   results <- collect(trapping) %>%
-    filter_(~ !valid_loc(locx, reflo = reflo),
-            ~ !valid_loc(locy, alpha = FALSE, reflo = reflo)) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    filter( !valid_loc(locx, reflo = reflo),
+             !valid_loc(locy, alpha = FALSE, reflo = reflo)) %>%
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -203,7 +193,7 @@ check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_loc"
   if (nrow(results) == 0) {
     message("check_trapping_loc: no errors found.")
@@ -211,16 +201,11 @@ check_trapping_loc.krsp <- function(con, grid, year, observer, reflo = TRUE) {
   return(results)
 }
 
-#' @export
-#' @rdname check_trapping
-check_trapping_colours <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_colours")
-}
 
 #' @export
-check_trapping_colours.krsp <- function(con, grid, year, observer) {
+check_trapping_colours <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -235,13 +220,13 @@ check_trapping_colours.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(squirrel_id),
+      mutate(year = year(date)) %>%
+      filter(!is.na(squirrel_id),
               # ft 4 = trapping death
               # ft 10 = natural death
               # ft 12 = handling death
-              ~ !(ft %in% c(4, 10, 12))) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+               !(ft %in% c(4, 10, 12))) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -258,40 +243,40 @@ check_trapping_colours.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # find bad colours
   results <- collect(trapping) %>%
-    filter_(
+    filter(
       # colours shouldn't be blank
-      ~ is.na(color_left) | is.na(color_right) |
+       is.na(color_left) | is.na(color_right) |
         # valid colours
         !valid_color(color_left) | !valid_color(color_right)) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -300,7 +285,7 @@ check_trapping_colours.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_colours"
   if (nrow(results) == 0) {
     message("check_trapping_colours: no errors found.")
@@ -309,15 +294,9 @@ check_trapping_colours.krsp <- function(con, grid, year, observer) {
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_tags <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_tags")
-}
-
-#' @export
-check_trapping_tags.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -332,13 +311,13 @@ check_trapping_tags.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(squirrel_id),
+      mutate(year =  year(date)) %>%
+      filter( !is.na(squirrel_id),
               # ft 4 = trapping death
               # ft 10 = natural death
               # ft 12 = handling death
-              ~ !(ft %in% c(4, 10, 12))) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+               !(ft %in% c(4, 10, 12))) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -355,40 +334,40 @@ check_trapping_tags.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # find bad tags
   results <- collect(trapping) %>%
-    filter_(
+    filter(
       # tags shouldn't be blank
-      ~ is.na(tagLft) | is.na(tagRt) |
+       is.na(tagLft) | is.na(tagRt) |
         # tags are 5 characters long and composed of #'s and DFHJM
         !valid_tag(tagLft) | !valid_tag(tagRt)) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -397,7 +376,7 @@ check_trapping_tags.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_tags"
   if (nrow(results) == 0) {
     message("check_trapping_tags: no errors found.")
@@ -406,17 +385,10 @@ check_trapping_tags.krsp <- function(con, grid, year, observer) {
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_weight <- function(con, grid, year, observer,
-                                  missing_wt = FALSE) {
-  UseMethod("check_trapping_weight")
-}
-
-#' @export
-check_trapping_weight.krsp <- function(con, grid, year, observer,
                                        missing_wt = FALSE) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -432,10 +404,10 @@ check_trapping_weight.krsp <- function(con, grid, year, observer,
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
+      mutate(year =  year(date)) %>%
       # find missing collar weight
-      filter_(~ !is.na(squirrel_id)) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      filter( !is.na(squirrel_id)) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -452,44 +424,44 @@ check_trapping_weight.krsp <- function(con, grid, year, observer,
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # find bad weights
   results <- collect(trapping) %>%
-    filter_(
+    filter(
       # missing or zero weight, unless released
-      ~ (missing_wt & coalesce(wgt, 0L) == 0L &
+       (missing_wt & coalesce(wgt, 0L) == 0L &
            !grepl("^rel", comments, ignore.case = TRUE)) |
         (missing_wt & coalesce(bagWt, 0L) == 0L &
            !grepl("^rel", comments, ignore.case = TRUE)) |
         # outside of normal range
         !(coalesce(wgt, 0L) == 0L | (wgt >= 70 & wgt <= 390)) |
         !(coalesce(bagWt, 0L) == 0L | (bagWt >= 75 & bagWt <= 170))) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -498,7 +470,7 @@ check_trapping_weight.krsp <- function(con, grid, year, observer,
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_weight"
   if (nrow(results) == 0) {
     message("check_trapping_weight: no errors found.")
@@ -507,15 +479,9 @@ check_trapping_weight.krsp <- function(con, grid, year, observer,
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_collwt <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_collwt")
-}
-
-#' @export
-check_trapping_collwt.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -530,12 +496,12 @@ check_trapping_collwt.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
+      mutate(year =  year(date)) %>%
       # find missing collar weight
-      filter_(~ !is.na(squirrel_id),
-              ~ radio %in% c(2, 3, 4),
-              ~ !(coalesce(collWt, 0) %in% c(4,8))) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      filter( !is.na(squirrel_id),
+               radio %in% c(2, 3, 4),
+               !(coalesce(collWt, 0) %in% c(4,8))) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -552,35 +518,35 @@ check_trapping_collwt.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # collect results
   results <- collect(trapping) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -589,7 +555,7 @@ check_trapping_collwt.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_collwt"
   if (nrow(results) == 0) {
     message("check_trapping_collwt: no errors found.")
@@ -598,15 +564,9 @@ check_trapping_collwt.krsp <- function(con, grid, year, observer) {
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_dna <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_dna")
-}
-
-#' @export
-check_trapping_dna.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -621,9 +581,9 @@ check_trapping_dna.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(dna1) | !is.na(dna2)) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      mutate(year =  year(date)) %>%
+      filter( !is.na(dna1) | !is.na(dna2)) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -640,36 +600,36 @@ check_trapping_dna.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # find bad dna vial codes
   results <- collect(trapping) %>%
-    filter_(~ !valid_dna(dna1, grid, year) | !valid_dna(dna2, grid, year)) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    filter( !valid_dna(dna1, grid, year) | !valid_dna(dna2, grid, year)) %>%
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -678,7 +638,7 @@ check_trapping_dna.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_dna"
   if (nrow(results) == 0) {
     message("check_trapping_dna: no errors found.")
@@ -687,15 +647,9 @@ check_trapping_dna.krsp <- function(con, grid, year, observer) {
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_newdna <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_newdna")
-}
-
-#' @export
-check_trapping_newdna.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -710,12 +664,12 @@ check_trapping_newdna.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(squirrel_id),
+      mutate(year =  year(date)) %>%
+      filter( !is.na(squirrel_id),
               # new adult, new juvenile, or RIP/RIP
-              ~ ft %in% c(2, 7, 13),
-              ~ is.na(dna1) | is.na(dna2)) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+               ft %in% c(2, 7, 13),
+               is.na(dna1) | is.na(dna2)) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -732,35 +686,35 @@ check_trapping_newdna.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # collect
   results <- collect(trapping) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -769,7 +723,7 @@ check_trapping_newdna.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_newdna"
   if (nrow(results) == 0) {
     message("check_trapping_newdna: no errors found.")
@@ -778,15 +732,9 @@ check_trapping_newdna.krsp <- function(con, grid, year, observer) {
 }
 
 #' @export
-#' @rdname check_trapping
 check_trapping_fate <- function(con, grid, year, observer) {
-  UseMethod("check_trapping_fate")
-}
-
-#' @export
-check_trapping_fate.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -801,10 +749,10 @@ check_trapping_fate.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ is.na(ft)) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      mutate(year =  year(date)) %>%
+      filter( !is.na(squirrel_id),
+               is.na(ft)) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "date",
               "ft", "rep_con",
               "locx", "locy",
@@ -821,35 +769,35 @@ check_trapping_fate.krsp <- function(con, grid, year, observer) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      trapping <- filter_(trapping, ~ grid == grid_arg)
+      trapping <- filter(trapping,  grid == grid_arg)
     } else {
-      trapping <- filter_(trapping, ~ grid %in% grid_arg)
+      trapping <- filter(trapping,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      trapping <- filter_(trapping, ~ year == year_arg)
+      trapping <- filter(trapping,  year == year_arg)
     } else {
-      trapping <- filter_(trapping, ~ year %in% year_arg)
+      trapping <- filter(trapping,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      trapping <- filter_(trapping, ~ observer == observer_arg)
+      trapping <- filter(trapping,  observer == observer_arg)
     } else {
-      trapping <- filter_(trapping, ~ observer %in% observer_arg)
+      trapping <- filter(trapping,  observer %in% observer_arg)
     }
   }
 
   # collect
   results <- collect(trapping) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tagLft, tagRt, sep ="/")) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep ="/"),
+            tags =  paste(tagLft, tagRt, sep ="/")) %>%
+    select("id", "grid", "year", "observer",
             "date",
             "ft", "rep_con",
             "locx", "locy",
@@ -858,7 +806,7 @@ check_trapping_fate.krsp <- function(con, grid, year, observer) {
             "bagWt", "wgt",
             "dna1", "dna2",
             "comments") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange(grid, year, observer, date)
   attr(results, "check") <- "check_trapping_fate"
   if (nrow(results) == 0) {
     message("check_trapping_fate: no errors found.")
