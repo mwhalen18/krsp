@@ -53,14 +53,10 @@
 #' check_nest(con, year = 2012) %>%
 #'   count(check)
 #' }
-check_nest <- function(con, grid, year) {
-  UseMethod("check_nest")
-}
-
 #' @export
-check_nest.krsp <- function(con, grid, year) {
+check_nest <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -100,20 +96,14 @@ check_nest.krsp <- function(con, grid, year) {
                       grid_check, stringsAsFactors = FALSE)
 
   # combine
-  as_data_frame(bind_rows(loc_check, n1loc_check, n2loc_check, dna_check,
+  tibble(bind_rows(loc_check, n1loc_check, n2loc_check, dna_check,
                           weight_check, notch_check, grid_check))
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_loc <- function(con, grid, year) {
-  UseMethod("check_nest_loc")
-}
-
-#' @export
-check_nest_loc.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -126,40 +116,40 @@ check_nest_loc.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !(is.na(date1) & is.na(tagDt))) %>%
-      select_("id", "grid", year = "yr",
-              mother_id = "squirrel_id", litter_number = "ln", "br",
-              "date1",  "tagDt",
-              "locx", "locy",
-              "nx1", "ny1", "nx2", "ny2")
+      filter( !is.na(squirrel_id),
+               !(is.na(date1) & is.na(tagDt))) %>%
+      select(id, grid, year = yr,
+              mother_id = squirrel_id, litter_number = ln, br,
+              date1,  tagDt,
+              locx, locy,
+              nx1, ny1, nx2, ny2)
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      litter <- filter_(litter, ~ grid == grid_arg)
+      litter <- filter(litter,  grid == grid_arg)
     } else {
-      litter <- filter_(litter, ~ grid %in% grid_arg)
+      litter <- filter(litter,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      litter <- filter_(litter, ~ year == year_arg)
+      litter <- filter(litter,  year == year_arg)
     } else {
-      litter <- filter_(litter, ~ year %in% year_arg)
+      litter <- filter(litter,  year %in% year_arg)
     }
   }
 
   # find bad locs
   results <- collect(litter) %>%
-    filter_(~ !valid_loc(locx, reflo = TRUE),
-            ~ !valid_loc(locy, alpha = FALSE, reflo = TRUE)) %>%
-    mutate_(date = ~ coalesce(date1, tagDt)) %>%
-    arrange_("grid", "year", "date")
+    filter( !valid_loc(locx, reflo = TRUE),
+             !valid_loc(locy, alpha = FALSE, reflo = TRUE)) %>%
+    mutate(date =  coalesce(date1, tagDt)) %>%
+    arrange(grid, year, date)
   attr(results, "check") <- "check_nest_loc"
   if (nrow(results) == 0) {
     message("check_nest_loc: no errors found.")
@@ -167,16 +157,11 @@ check_nest_loc.krsp <- function(con, grid, year) {
   return(results)
 }
 
-#' @export
-#' @rdname check_nest
-check_nest_n1loc <- function(con, grid, year) {
-  UseMethod("check_nest_n1loc")
-}
 
 #' @export
-check_nest_n1loc.krsp <- function(con, grid, year) {
+check_nest_n1loc <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -189,40 +174,40 @@ check_nest_n1loc.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !is.na(date1)) %>%
-      select_("id", "grid", year = "yr",
-              mother_id = "squirrel_id", litter_number = "ln", "br",
-              "date1",  "tagDt",
-              "locx", "locy",
-              "nx1", "ny1", "nx2", "ny2")
+      filter( !is.na(squirrel_id),
+               !is.na(date1)) %>%
+      select(id, grid, year = yr,
+              mother_id = squirrel_id, litter_number = ln, br,
+              date1,  tagDt,
+              locx, locy,
+              nx1, ny1, nx2, ny2)
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      litter <- filter_(litter, ~ grid == grid_arg)
+      litter <- filter(litter,  grid == grid_arg)
     } else {
-      litter <- filter_(litter, ~ grid %in% grid_arg)
+      litter <- filter(litter,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      litter <- filter_(litter, ~ year == year_arg)
+      litter <- filter(litter,  year == year_arg)
     } else {
-      litter <- filter_(litter, ~ year %in% year_arg)
+      litter <- filter(litter,  year %in% year_arg)
     }
   }
 
   # find bad locs
   results <- collect(litter) %>%
-    filter_(~ !valid_loc(nx1),
-            ~ !valid_loc(ny1, alpha = FALSE)) %>%
-    mutate_(date = ~ coalesce(date1, tagDt)) %>%
-    arrange_("grid", "year", "date")
+    filter( !valid_loc(nx1),
+             !valid_loc(ny1, alpha = FALSE)) %>%
+    mutate(date =  coalesce(date1, tagDt)) %>%
+    arrange(grid, year, date)
   attr(results, "check") <- "check_nest_n1loc"
   if (nrow(results) == 0) {
     message("check_nest_n1loc: no errors found.")
@@ -231,15 +216,9 @@ check_nest_n1loc.krsp <- function(con, grid, year) {
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_n2loc <- function(con, grid, year) {
-  UseMethod("check_nest_n2loc")
-}
-
-#' @export
-check_nest_n2loc.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -252,40 +231,40 @@ check_nest_n2loc.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !is.na(tagDt)) %>%
-      select_("id", "grid", year = "yr",
-              mother_id = "squirrel_id", litter_number = "ln", "br",
-              "date1",  "tagDt",
-              "locx", "locy",
-              "nx1", "ny1", "nx2", "ny2")
+      filter( !is.na(squirrel_id),
+               !is.na(tagDt)) %>%
+      select(id, grid, year = yr,
+              mother_id = squirrel_id, litter_number = ln, br,
+              date1,  tagDt,
+              locx, locy,
+              nx1, ny1, nx2, ny2)
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      litter <- filter_(litter, ~ grid == grid_arg)
+      litter <- filter(litter,  grid == grid_arg)
     } else {
-      litter <- filter_(litter, ~ grid %in% grid_arg)
+      litter <- filter(litter,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      litter <- filter_(litter, ~ year == year_arg)
+      litter <- filter(litter,  year == year_arg)
     } else {
-      litter <- filter_(litter, ~ year %in% year_arg)
+      litter <- filter(litter,  year %in% year_arg)
     }
   }
 
   # find bad locs
   results <- collect(litter) %>%
-    filter_(~ !valid_loc(nx2),
-            ~ !valid_loc(ny2, alpha = FALSE)) %>%
-    mutate_(date = ~ coalesce(date1, tagDt)) %>%
-    arrange_("grid", "year", "date")
+    filter( !valid_loc(nx2),
+             !valid_loc(ny2, alpha = FALSE)) %>%
+    mutate(date =  coalesce(date1, tagDt)) %>%
+    arrange(grid, year, date)
   attr(results, "check") <- "check_nest_n2loc"
   if (nrow(results) == 0) {
     message("check_nest_n2loc: no errors found.")
@@ -294,15 +273,9 @@ check_nest_n2loc.krsp <- function(con, grid, year) {
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_weight <- function(con, grid, year) {
-  UseMethod("check_nest_weight")
-}
-
-#' @export
-check_nest_weight.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -315,18 +288,18 @@ check_nest_weight.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !(is.na(date1) & is.na(tagDt))) %>%
-      select_("id", "grid", year = "yr",
-              mother_id = "squirrel_id", litter_number = "ln", "br",
-              "date1",  "tagDt",
-              "locx", "locy",
-              "nx1", "ny1", "nx2", "ny2")
+      filter( !is.na(squirrel_id),
+               !(is.na(date1) & is.na(tagDt))) %>%
+      select(id, grid, year = yr,
+              mother_id = squirrel_id, litter_number = "ln", "br",
+              date1,  tagDt,
+              locx, locy,
+              nx1, ny1, nx2, ny2)
     juvenile <- tbl(con, "juvenile") %>%
-      select_(id = "litter_id", "squirrel_id",
-              "sex", "notch",
-              n1_wt = "weight", n2_wt = "tagWT",
-              "dna1", "dna2", "comments")
+      select(id = litter_id, squirrel_id,
+              sex, notch,
+              n1_wt = weight, n2_wt = tagWT,
+              dna1, dna2, comments)
     nest <- inner_join(litter, juvenile, by = "id")
   })
   # filtering
@@ -334,35 +307,35 @@ check_nest_weight.krsp <- function(con, grid, year) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      nest <- filter_(nest, ~ grid == grid_arg)
+      nest <- filter(nest,  grid == grid_arg)
     } else {
-      nest <- filter_(nest, ~ grid %in% grid_arg)
+      nest <- filter(nest,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      nest <- filter_(nest, ~ year == year_arg)
+      nest <- filter(nest,  year == year_arg)
     } else {
-      nest <- filter_(nest, ~ year %in% year_arg)
+      nest <- filter(nest,  year %in% year_arg)
     }
   }
   # find suspicious weights
   suppressWarnings({
     results <- collect(nest) %>%
-      mutate_(n2_missing = ~grepl("(missing|not found|not in|dead)",
+      mutate(n2_missing = grepl("(missing|not found|not in|dead)",
                                   comments, ignore.case = TRUE) &
                 grepl("n2|nest 2", comments, ignore.case = TRUE)) %>%
-      filter_(
+      filter(
         # nest 1
-        ~ (!is.na(date1) & (is.na(n1_wt) | n1_wt < 7 | n1_wt > 25)) |
+         (!is.na(date1) & (is.na(n1_wt) | n1_wt < 7 | n1_wt > 25)) |
           # nest 2
           (!is.na(tagDt) & !n2_missing &
              (is.na(n2_wt) | n2_wt < 30 | n2_wt > 80))) %>%
-      select_(~ -n2_missing) %>%
-      mutate_(date = ~ coalesce(date1, tagDt)) %>%
-      arrange_("grid", "year", "date")
+      select(-n2_missing) %>%
+      mutate(date =  coalesce(date1, tagDt)) %>%
+      arrange(grid, year, date)
   })
   attr(results, "check") <- "check_nest_weight"
   if (nrow(results) == 0) {
@@ -372,15 +345,9 @@ check_nest_weight.krsp <- function(con, grid, year) {
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_dna <- function(con, grid, year) {
-  UseMethod("check_nest_dna")
-}
-
-#' @export
-check_nest_dna.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -393,18 +360,18 @@ check_nest_dna.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !(is.na(date1) & is.na(tagDt))) %>%
-      select_("id", "grid", year = "yr",
-              mother_id = "squirrel_id", litter_number = "ln", "br",
-              "date1",  "tagDt",
-              "locx", "locy",
-              "nx1", "ny1", "nx2", "ny2")
+      filter( !is.na(squirrel_id),
+               !(is.na(date1) & is.na(tagDt))) %>%
+      select(id, grid, year = yr,
+              mother_id = squirrel_id, litter_number = ln, br,
+              date1,  tagDt,
+              locx, locy,
+              nx1, ny1, nx2, ny2)
     juvenile <- tbl(con, "juvenile") %>%
-      select_(id = "litter_id", "squirrel_id",
-              "sex", "notch",
-              n1_wt = "weight", n2_wt = "tagWT",
-              "dna1", "dna2", "comments")
+      select(id = litter_id, "squirrel_id",
+              sex, notch,
+              n1_wt = weight, n2_wt = tagWT,
+              dna1, dna2, comments)
     nest <- inner_join(litter, juvenile, by = "id")
   })
   # filtering
@@ -412,29 +379,29 @@ check_nest_dna.krsp <- function(con, grid, year) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      nest <- filter_(nest, ~ grid == grid_arg)
+      nest <- filter(nest,  grid == grid_arg)
     } else {
-      nest <- filter_(nest, ~ grid %in% grid_arg)
+      nest <- filter(nest,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      nest <- filter_(nest, ~ year == year_arg)
+      nest <- filter(nest,  year == year_arg)
     } else {
-      nest <- filter_(nest, ~ year %in% year_arg)
+      nest <- filter(nest,  year %in% year_arg)
     }
   }
   # find invalid or missing dna vial codes
   suppressWarnings({
     results <- collect(nest) %>%
-      filter_(
-        ~ (!is.na(date1) & (!valid_dna(dna1, grid, year) | is.na(dna1))) |
+      filter(
+         (!is.na(date1) & (!valid_dna(dna1, grid, year) | is.na(dna1))) |
           (!is.na(tagDt) & !is.na(n2_wt) &
              (!valid_dna(dna2, grid, year) | is.na(dna2)))) %>%
-      mutate_(date = ~ coalesce(date1, tagDt)) %>%
-      arrange_("grid", "year", "date")
+      mutate(date =  coalesce(date1, tagDt)) %>%
+      arrange(grid, year, date)
   })
   attr(results, "check") <- "check_nest_dna"
   if (nrow(results) == 0) {
@@ -444,15 +411,9 @@ check_nest_dna.krsp <- function(con, grid, year) {
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_notch <- function(con, grid, year) {
-  UseMethod("check_nest_notch")
-}
-
-#' @export
-check_nest_notch.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -466,20 +427,20 @@ check_nest_notch.krsp <- function(con, grid, year) {
   suppressWarnings({
     # juveniles with duplicate notches
     notch_counts <- tbl(con, "juvenile") %>%
-      filter_(~ !is.na(notch)) %>%
-      group_by_("litter_id", "sex", "notch") %>%
-      summarize_(n = ~ n()) %>%
-      filter_(~ n > 1)
+      filter( !is.na(notch)) %>%
+      group_by(litter_id, sex, notch) %>%
+      summarize(n =  n()) %>%
+      filter( n > 1)
     juvenile <- tbl(con, "juvenile") %>%
       inner_join(notch_counts, by = c("litter_id", "sex", "notch")) %>%
-      select_(id = "litter_id", "squirrel_id",
+      select(id = "litter_id", "squirrel_id",
               "sex", "notch",
               n1_wt = "weight", n2_wt = "tagWT",
               "dna1", "dna2", "comments")
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id),
-              ~ !(is.na(date1) & is.na(tagDt))) %>%
-      select_("id", "grid", year = "yr",
+      filter( !is.na(squirrel_id),
+               !(is.na(date1) & is.na(tagDt))) %>%
+      select("id", "grid", year = "yr",
               mother_id = "squirrel_id", litter_number = "ln", "br",
               "date1",  "tagDt",
               "locx", "locy",
@@ -491,25 +452,25 @@ check_nest_notch.krsp <- function(con, grid, year) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      nest <- filter_(nest, ~ grid == grid_arg)
+      nest <- filter(nest,  grid == grid_arg)
     } else {
-      nest <- filter_(nest, ~ grid %in% grid_arg)
+      nest <- filter(nest,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      nest <- filter_(nest, ~ year == year_arg)
+      nest <- filter(nest,  year == year_arg)
     } else {
-      nest <- filter_(nest, ~ year %in% year_arg)
+      nest <- filter(nest,  year %in% year_arg)
     }
   }
   # collect
   suppressWarnings({
     results <- collect(nest) %>%
-      mutate_(date = ~ coalesce(date1, tagDt)) %>%
-      arrange_("grid", "year", "date")
+      mutate(date =  coalesce(date1, tagDt)) %>%
+      arrange(grid, year, date)
   })
   attr(results, "check") <- "check_nest_notch"
   if (nrow(results) == 0) {
@@ -519,15 +480,9 @@ check_nest_notch.krsp <- function(con, grid, year) {
 }
 
 #' @export
-#' @rdname check_nest
 check_nest_grid <- function(con, grid, year) {
-  UseMethod("check_nest_grid")
-}
-
-#' @export
-check_nest_grid.krsp <- function(con, grid, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year))
 
@@ -540,48 +495,48 @@ check_nest_grid.krsp <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      filter_(~ !is.na(squirrel_id)) %>%
-      select_("id", grid_litter = "grid", year = "yr",
+      filter( !is.na(squirrel_id)) %>%
+      select("id", grid_litter = "grid", year = "yr",
               mother_id = "squirrel_id", litter_number = "ln", "br",
               "date1",  "tagDt",
               "locx", "locy",
               "nx1", "ny1", "nx2", "ny2")
     squirrel <- tbl(con, "squirrel") %>%
-      select_(mother_id = "id",
+      select(mother_id = "id",
               grid_squirrel = "gr")
     nest <- inner_join(litter, squirrel, by = "mother_id") %>%
-      filter_(~ grid_litter != grid_squirrel)
+      filter( grid_litter != grid_squirrel)
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      nest <- filter_(nest, ~ grid == grid_arg)
+      nest <- filter(nest,  grid == grid_arg)
     } else {
-      nest <- filter_(nest, ~ grid %in% grid_arg)
+      nest <- filter(nest,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      nest <- filter_(nest, ~ year == year_arg)
+      nest <- filter(nest,  year == year_arg)
     } else {
-      nest <- filter_(nest, ~ year %in% year_arg)
+      nest <- filter(nest,  year %in% year_arg)
     }
   }
   # find mis-matched grids
   suppressWarnings({
     results <- collect(nest) %>%
-      mutate_(grid = ~ paste(grid_litter, grid_squirrel, sep = "/")) %>%
-      select_("id", "grid", "year",
+      mutate(grid =  paste(grid_litter, grid_squirrel, sep = "/")) %>%
+      select("id", "grid", "year",
               "mother_id", "litter_number", "br",
               "date1",  "tagDt",
               "locx", "locy",
               "nx1", "ny1", "nx2", "ny2") %>%
-      mutate_(date = ~ coalesce(date1, tagDt)) %>%
-      arrange_("grid", "year", "date")
+      mutate(date =  coalesce(date1, tagDt)) %>%
+      arrange(grid, year, date)
   })
   attr(results, "check") <- "check_nest_grid"
   if (nrow(results) == 0) {
