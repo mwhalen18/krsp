@@ -37,14 +37,14 @@
 #' # or perform them all at once
 #' check_behaviour(con, grid = "JO", year = 2012)
 #' }
-check_behaviour <- function(con, grid, year, observer) {
-  UseMethod("check_behaviour")
-}
+#check_behaviour <- function(con, grid, year, observer) {
+#  UseMethod("check_behaviour")
+#}
 
 #' @export
-check_behaviour.krsp <- function(con, grid, year, observer) {
+check_behaviour <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -69,19 +69,13 @@ check_behaviour.krsp <- function(con, grid, year, observer) {
   time_check <- cbind(check = rep(attr(time_check, "check"), nrow(time_check)),
                       time_check, stringsAsFactors = FALSE)
   # combine
-  as_data_frame(bind_rows(loc_check, mode_check, time_check))
+  dplyr::as_tibble(bind_rows(loc_check, mode_check, time_check))
 }
 
 #' @export
-#' @rdname check_behaviour
 check_behaviour_loc <- function(con, grid, year, observer) {
-  UseMethod("check_behaviour_loc")
-}
-
-#' @export
-check_behaviour_loc.krsp <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -92,60 +86,59 @@ check_behaviour_loc.krsp <- function(con, grid, year, observer) {
     message("No filtering criteria supplied, defaulting to current year.")
     year <- current_year()
   }
-
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     behaviour <- tbl(con, "behaviour") %>%
-      mutate_(year = ~ year(date)) %>%
-      select_("id", "grid", "year", "observer",
+      mutate(year = year(date)) %>%
+      select("id", "grid", "year", "observer",
               "date", "time", "mode", "behaviour", "detail",
               "locx", "locy",
               "squirrel_id",
               "color_left", "color_right",
               "tag_left", "tag_right")
   })
+  
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      behaviour <- filter_(behaviour, ~ grid == grid_arg)
+      behaviour <- filter(behaviour, grid == grid_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ grid %in% grid_arg)
+      behaviour <- filter(behaviour, grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      behaviour <- filter_(behaviour, ~ year == year_arg)
+      behaviour <- filter(behaviour, year == year_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ year %in% year_arg)
+      behaviour <- filter(behaviour, year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      behaviour <- filter_(behaviour, ~ observer == observer_arg)
+      behaviour <- filter(behaviour, observer == observer_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ observer %in% observer_arg)
+      behaviour <- filter(behaviour, observer %in% observer_arg)
     }
   }
-
   # find bad locs
   results <- collect(behaviour) %>%
-    filter_(~ !valid_loc(locx),
-            ~ !valid_loc(locy, alpha = FALSE)) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep ="/"),
-            tags = ~ paste(tag_left, tag_right, sep ="/"),
-            colours = ~ ifelse(is.na(squirrel_id), NA, colours),
-            tags = ~ ifelse(is.na(squirrel_id), NA, tags)) %>%
-    select_("id", "grid", "year", "observer",
+    filter(!valid_loc(locx),
+           !valid_loc(locy, alpha = FALSE)) %>%
+    mutate(colours = paste(color_left, color_right, sep ="/"),
+            tags = paste(tag_left, tag_right, sep ="/"),
+            colours = ifelse(is.na(squirrel_id), NA, colours),
+            tags = ifelse(is.na(squirrel_id), NA, tags)) %>%
+    select("id", "grid", "year", "observer",
             "date", "time", "mode", "behaviour", "detail",
             "locx", "locy",
             "squirrel_id", "colours", "tags") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange("grid", "year", "observer", "date")
   attr(results, "check") <- "check_behaviour_loc"
   if (nrow(results) == 0) {
     message("check_behaviour_loc: no errors found.")
@@ -153,16 +146,14 @@ check_behaviour_loc.krsp <- function(con, grid, year, observer) {
   return(results)
 }
 
-#' @export
-#' @rdname check_behaviour
-check_behaviour_mode <- function(con, grid, year, observer) {
-  UseMethod("check_behaviour_mode")
-}
+#check_behaviour_mode <- function(con, grid, year, observer) {
+#  UseMethod("check_behaviour_mode")
+#}
 
 #' @export
-check_behaviour_mode.krsp <- function(con, grid, year, observer) {
+check_behaviour_mode <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -177,72 +168,67 @@ check_behaviour_mode.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     behaviour <- tbl(con, "behaviour") %>%
-      mutate_(year = ~ year(date)) %>%
-      select_("id", "grid", "year", "observer",
+      mutate(year = year(date)) %>%
+      select("id", "grid", "year", "observer",
               "date", "time", "mode", "behaviour", "detail",
               "locx", "locy",
               "squirrel_id",
               "color_left", "color_right",
               "tag_left", "tag_right") %>%
       # find missing modes
-      filter_(~ is.na(mode))
+      filter(is.na(mode))
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      behaviour <- filter_(behaviour, ~ grid == grid_arg)
+      behaviour <- filter(behaviour, grid == grid_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ grid %in% grid_arg)
+      behaviour <- filter(behaviour, grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      behaviour <- filter_(behaviour, ~ year == year_arg)
+      behaviour <- filter(behaviour, year == year_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ year %in% year_arg)
+      behaviour <- filter(behaviour, year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      behaviour <- filter_(behaviour, ~ observer == observer_arg)
+      behaviour <- filter(behaviour, observer == observer_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ observer %in% observer_arg)
+      behaviour <- filter(behaviour, observer %in% observer_arg)
     }
   }
 
   # results
   results <- collect(behaviour) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep = "/"),
-            tags = ~ paste(tag_left, tag_right, sep = "/"),
-            colours = ~ ifelse(is.na(squirrel_id), NA, colours),
-            tags = ~ ifelse(is.na(squirrel_id), NA, tags)) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours = paste(color_left, color_right, sep = "/"),
+            tags = paste(tag_left, tag_right, sep = "/"),
+            colours = ifelse(is.na(squirrel_id), NA, colours),
+            tags =  ifelse(is.na(squirrel_id), NA, tags)) %>%
+    select("id", "grid", "year", "observer",
             "date", "time", "mode", "behaviour", "detail",
             "locx", "locy",
             "squirrel_id", "colours", "tags") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange("grid", "year", "observer", "date")
   attr(results, "check") <- "check_behaviour_mode"
   if (nrow(results) == 0) {
     message("check_behaviour_mode: no errors found.")
   }
   return(results)
 }
-#' @export
-#' @rdname check_behaviour
-check_behaviour_time <- function(con, grid, year, observer) {
-  UseMethod("check_behaviour_time")
-}
 
 #' @export
-check_behaviour_time.krsp <- function(con, grid, year, observer) {
+check_behaviour_time <- function(con, grid, year, observer) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               missing(year) || valid_year(year),
               missing(observer) || is.character(observer),
@@ -257,60 +243,60 @@ check_behaviour_time.krsp <- function(con, grid, year, observer) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     behaviour <- tbl(con, "behaviour") %>%
-      mutate_(year = ~ year(date)) %>%
-      select_("id", "grid", "year", "observer",
+      mutate(year =  year(date)) %>%
+      select("id", "grid", "year", "observer",
               "date", "time", "mode", "behaviour", "detail",
               "locx", "locy",
               "squirrel_id",
               "color_left", "color_right",
               "tag_left", "tag_right") %>%
 
-      filter_(
+      filter(
         # exclude nest locs because could be night locs
-        ~ mode != 4,
+         mode != 4,
         #  behaviours before 6am and after 10pm
-        ~ !(time > "06:00:00" & time < "22:00:00"))
+         !(time > "06:00:00" & time < "22:00:00"))
   })
   # filtering
   if (!missing(grid)) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      behaviour <- filter_(behaviour, ~ grid == grid_arg)
+      behaviour <- filter(behaviour,  grid == grid_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ grid %in% grid_arg)
+      behaviour <- filter(behaviour,  grid %in% grid_arg)
     }
   }
   if (!missing(year)) {
     year_arg <- as.integer(year)
     # if-statment required due to dplyr bug with filter and %in%
     if (length(year) == 1) {
-      behaviour <- filter_(behaviour, ~ year == year_arg)
+      behaviour <- filter(behaviour,  year == year_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ year %in% year_arg)
+      behaviour <- filter(behaviour,  year %in% year_arg)
     }
   }
   if (!missing(observer)) {
     observer_arg <- observer
     # if-statment required due to dplyr bug with filter and %in%
     if (length(observer) == 1) {
-      behaviour <- filter_(behaviour, ~ observer == observer_arg)
+      behaviour <- filter(behaviour,  observer == observer_arg)
     } else {
-      behaviour <- filter_(behaviour, ~ observer %in% observer_arg)
+      behaviour <- filter(behaviour,  observer %in% observer_arg)
     }
   }
 
   # results
   results <- collect(behaviour) %>%
-    mutate_(colours = ~ paste(color_left, color_right, sep = "/"),
-            tags = ~ paste(tag_left, tag_right, sep = "/"),
-            colours = ~ ifelse(is.na(squirrel_id), NA, colours),
-            tags = ~ ifelse(is.na(squirrel_id), NA, tags)) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(colours =  paste(color_left, color_right, sep = "/"),
+            tags =  paste(tag_left, tag_right, sep = "/"),
+            colours =  ifelse(is.na(squirrel_id), NA, colours),
+            tags =  ifelse(is.na(squirrel_id), NA, tags)) %>%
+    select("id", "grid", "year", "observer",
             "date", "time", "mode", "behaviour", "detail",
             "locx", "locy",
             "squirrel_id", "colours", "tags") %>%
-    arrange_("grid", "year", "observer", "date")
+    arrange("grid", "year", "observer", "date")
   attr(results, "check") <- "check_behaviour_time"
   if (nrow(results) == 0) {
     message("check_behaviour_time: no errors found.")

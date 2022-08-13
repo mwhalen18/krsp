@@ -1,6 +1,6 @@
 #' Connect to the krsp database
 #'
-#' \code{krsp_connect} is a wrapper for \code{\link[dplyr]{src_mysql}} that
+#' \code{krsp_connect} is a wrapper for \code{\link[DBI]{dbConnect}} that
 #' connects to the KRSP database. By default, this function will connect to a
 #' local copy of the database as root user with no password. When connecting to
 #' a remote database, the host, username, and password must be supplied. This
@@ -16,7 +16,7 @@
 #'    instance of the krsp database these will be user specific and must be
 #'    supplied.
 #' @param group character; my.cnf option group
-#' @param ... Additional arguments passed on to \code{\link[dplyr]{src_mysql}}.
+#' @param ... Additional arguments passed on to \code{\link[DBI]{dbConnect}}.
 #'
 #' @return A connection to the krsp database for use with \code{dplyr}.
 #' @export
@@ -28,19 +28,18 @@
 krsp_connect <- function(dbname = "krsp", host = "localhost", port = 0L,
                          user = "root", password = "", group = NULL, ...) {
   if (is.null(group)) {
-    con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMySQL::MySQL(),
       dbname = dbname, host = host, port = port, 
-      user = user, password = password, ...))
+      user = user, password = password, ...)
     
     # con <- src_mysql(dbname = dbname, host = host, port = port,
     #                  user = user, password = password, ...)
   } else {
-    con <- dbplyr::src_dbi(DBI::dbConnect(RMySQL::MySQL(),
+    con <- DBI::dbConnect(RMySQL::MySQL(),
       group = group, dbname = NULL, host = NULL, password = NULL,
-      user = NULL, ...))
+      user = NULL, ...)
     # con <- src_mysql(group = group, dbname = NULL, host = NULL, password = NULL,
     #                  user = NULL, ...)
   }
-  class(con) <- c("krsp", class(con))
-  con
+  return(con)
 }
