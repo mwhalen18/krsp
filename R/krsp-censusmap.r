@@ -207,9 +207,9 @@ find_aug_census <- function(con, grid, year) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     census <- tbl(con, "census") %>%
-      filter_(~ gr == grid,
-              ~ census_date %in% dates) %>%
-      group_by_("census_date") %>%
+      filter(gr == grid,
+            census_date %in% dates) %>%
+      group_by(census_date) %>%
       summarise(n = n()) %>%
       collect()
   })

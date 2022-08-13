@@ -23,15 +23,11 @@
 #' krsp_census_progress(con, "JO", 2014, "may") %>%
 #'   head()
 #' }
-krsp_census_progress <- function(con, grid, year, census) {
-  UseMethod("krsp_census_progress")
-}
-
 #' @export
-krsp_census_progress.krsp <- function(con, grid, year,
+krsp_census_progress <- function(con, grid, year,
                                       census = c("august", "may")) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               valid_year(year, single = TRUE), year > 2012,
               valid_grid(grid, single = TRUE))
   census <- match.arg(census)
@@ -76,9 +72,9 @@ krsp_census_progress.krsp <- function(con, grid, year,
   suppressWarnings({
     # get necessary tables from database
     census <- tbl(con, "census") %>%
-      filter_(~ gr == grid_choice,
-              ~ census_date == end_date) %>%
-      select_("squirrel_id",
+      filter( gr == grid_choice,
+               census_date == end_date) %>%
+      select("squirrel_id",
               census_reflo = "reflo",
               census_fate = "sq_fate") %>%
       collect()
@@ -86,31 +82,31 @@ krsp_census_progress.krsp <- function(con, grid, year,
   })
   # remove possible duplicates in trapping
   recent <- recent %>%
-    group_by_("squirrel_id") %>%
-    filter_(~ id == max(id)) %>%
+    group_by(squirrel_id) %>%
+    filter( id == max(id)) %>%
     ungroup()
   results <- left_join(recent, census, by = "squirrel_id")
 
   # clean up
   results <- results %>%
-    mutate_(squirrel_id = ~ as.integer(squirrel_id),
-            locx = ~ loc_to_numeric(locx),
-            locy = ~ suppressWarnings(round(as.numeric(locy), 1)),
-            trap_date = ~ suppressWarnings(as.Date(lubridate::ymd(trap_date))),
-            color_left = ~ ifelse(is.na(color_left) | color_left == "",
+    mutate(squirrel_id =  as.integer(squirrel_id),
+            locx =  loc_to_numeric(locx),
+            locy =  suppressWarnings(round(as.numeric(locy), 1)),
+            trap_date =  suppressWarnings(as.Date(lubridate::ymd(trap_date))),
+            color_left =  ifelse(is.na(color_left) | color_left == "",
                                   "-", color_left),
-            color_right = ~ ifelse(is.na(color_right) | color_right == "",
+            color_right =  ifelse(is.na(color_right) | color_right == "",
                                    "-", color_right),
-            taglft = ~ ifelse(is.na(taglft) | taglft == "", "-", taglft),
-            tagrt = ~ ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
-            colours = ~ paste(color_left, color_right, sep = "/"),
-            tags = ~ paste(taglft, tagrt, sep = "/"),
-            sex = ~ factor(coalesce(sex, "?"),
+            taglft =  ifelse(is.na(taglft) | taglft == "", "-", taglft),
+            tagrt =  ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
+            colours =  paste(color_left, color_right, sep = "/"),
+            tags =  paste(taglft, tagrt, sep = "/"),
+            sex =  factor(coalesce(sex, "?"),
                            levels = c("F", "M", "?")),
-            in_census = ~ !(is.na(census_fate) & is.na(census_reflo))) %>%
-    select_("squirrel_id", "colours", "tags",
+            in_census =  !(is.na(census_fate) & is.na(census_reflo))) %>%
+    select("squirrel_id", "colours", "tags",
             "sex", "grid", "trap_date",
             "locx", "locy", "in_census", "census_reflo", "census_fate") %>%
-    arrange_("in_census", "locx", "locy")
+    arrange(in_census, locx, locy)
   return(results)
 }
