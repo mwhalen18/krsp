@@ -32,14 +32,11 @@
 #' con <- krsp_connect()
 #' check_collars(con, grid = "KL", year = 2014)
 #' }
-check_collars <- function(con, grid, year) {
-  UseMethod("check_collars")
-}
 
 #' @export
-check_collars.krsp <- function(con, grid, year = current_year()) {
+check_collars <- function(con, grid, year = current_year()) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(grid) || valid_grid(grid),
               valid_year(year, single = TRUE))
   year_arg <- as.integer(year)
@@ -74,12 +71,12 @@ check_collars.krsp <- function(con, grid, year = current_year()) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     collars <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
+      mutate(year = year(date)) %>%
       # find missing collar weight
-      filter_(~ !is.na(squirrel_id),
-              ~ radio %in% c(1, 2, 3, 4),
-              ~ year == year_arg) %>%
-      select_("id", grid = "gr", "year", observer = "obs",
+      filter(!is.na(squirrel_id),
+              radio %in% c(1, 2, 3, 4),
+              year == year_arg) %>%
+      select("id", grid = "gr", "year", observer = "obs",
               "squirrel_id", "date",
               "radio", "collar")
     recent <- krsp_sql(con, recent_query)
@@ -89,132 +86,131 @@ check_collars.krsp <- function(con, grid, year = current_year()) {
     grid_arg <- grid
     # if-statment required due to dplyr bug with filter and %in%
     if (length(grid) == 1) {
-      collars <- filter_(collars, ~ grid == grid_arg)
+      collars <- filter(collars,  grid == grid_arg)
     } else {
-      collars <- filter_(collars, ~ grid %in% grid_arg)
+      collars <- filter(collars,  grid %in% grid_arg)
     }
   }
   # collect results
   collars <- collect(collars) %>%
-    mutate_(date = ~ lubridate::ymd(date)) %>%
-    select_("id", "grid", "year", "observer",
+    mutate(date =  lubridate::ymd(date)) %>%
+    select("id", "grid", "year", "observer",
             "squirrel_id", "date", "radio", "collar")
   recent <- recent %>%
-    mutate_(
-      color_left = ~ ifelse(is.na(color_left) | color_left == "",
+    mutate(
+      color_left =  ifelse(is.na(color_left) | color_left == "",
                             "-", color_left),
-      color_right = ~ ifelse(is.na(color_right) | color_right == "",
+      color_right =  ifelse(is.na(color_right) | color_right == "",
                              "-", color_right),
-      taglft = ~ ifelse(is.na(taglft) | taglft == "", "-", taglft),
-      tagrt = ~ ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
-      locx = ~ ifelse(is.na(locx) | locx == "", "-", locx),
-      locy = ~ ifelse(is.na(locy) | locy == "", "-", locy),
-      colours = ~ paste(color_left, color_right, sep = "/"),
-      tags = ~ paste(taglft, tagrt, sep = "/"),
-      loc = ~ paste(locx, locy, sep = "/")) %>%
-    select_("squirrel_id", "date", "colours", "tags", "loc", "radio")
+      taglft =  ifelse(is.na(taglft) | taglft == "", "-", taglft),
+      tagrt =  ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
+      locx =  ifelse(is.na(locx) | locx == "", "-", locx),
+      locy =  ifelse(is.na(locy) | locy == "", "-", locy),
+      colours =  paste(color_left, color_right, sep = "/"),
+      tags =  paste(taglft, tagrt, sep = "/"),
+      loc =  paste(locx, locy, sep = "/")) %>%
+    select("squirrel_id", "date", "colours", "tags", "loc", "radio")
 
   # check frequency present and valid
   results <- collars %>%
-    filter_(~ !grepl("^[0-9]{6}$", collar)) %>%
-    mutate_(check = ~ "check_collars_frequency")
+    filter( !grepl("^[0-9]{6}$", collar)) %>%
+    mutate(check =  "check_collars_frequency")
 
   # create collar timeline
   rc_new <- collars %>%
-    filter_(~ radio == 1) %>%
-    distinct_("squirrel_id", "date") %>%
-    rename_(date_new = "date")
+    filter( radio == 1) %>%
+    distinct(squirrel_id, date) %>%
+    rename(date_new = "date")
   rc_off <- collars %>%
-    filter_(~ radio == 4) %>%
-    distinct_("squirrel_id", "date") %>%
-    rename_(date_off = "date")
+    filter( radio == 4) %>%
+    distinct(squirrel_id, date) %>%
+    rename(date_off = date)
   # combine rc new and rc off
   timeline <- left_join(rc_new, rc_off, by = "squirrel_id") %>%
     # find rc off closest to rc new
-    mutate_(date_off = ~ if_else(date_off < date_new, as.Date(NA), date_off)) %>%
-    group_by_("squirrel_id", "date_new") %>%
-    arrange_("squirrel_id", "date_new", "date_off") %>%
+    mutate(date_off =  if_else(date_off < date_new, as.Date(NA), date_off)) %>%
+    group_by(squirrel_id, date_new) %>%
+    arrange(squirrel_id, date_new, date_off) %>%
     do(utils::head(., 1)) %>%
     # find rc new closest to rc off
-    mutate_(date_diff = ~ as.integer(date_off - date_new),
-            date_diff = ~ if_else(date_diff < 0, NA_integer_, date_diff)) %>%
-    group_by_("squirrel_id", "date_off") %>%
-    mutate_(date_to = ~ if_else(date_diff == min(date_diff),
+    mutate(date_diff =  as.integer(date_off - date_new),
+            date_diff =  if_else(date_diff < 0, NA_integer_, date_diff)) %>%
+    group_by(squirrel_id, date_off) %>%
+    mutate(date_to =  if_else(date_diff == min(date_diff),
                                  date_off, as.Date(NA))) %>%
     ungroup() %>%
-    mutate_(date_off = ~ date_to) %>%
-    select_("squirrel_id", "date_new", "date_off")
+    mutate(date_off =  date_to) %>%
+    select("squirrel_id", "date_new", "date_off")
 
   # rc removed without rc new
   results <- collars %>%
-    filter_(~ radio == 4) %>%
+    filter( radio == 4) %>%
     anti_join(timeline, by = c("squirrel_id", date = "date_off")) %>%
-    mutate_(check = ~ "check_collars_rcnew") %>%
+    mutate(check =  "check_collars_rcnew") %>%
     bind_rows(results)
 
   # rc new without rc off, based on subsequent rc new
   results <- timeline %>%
-    group_by_("squirrel_id") %>%
-    mutate_(rank = ~ dense_rank(date_new)) %>%
-    filter_(~ (is.na(date_off) & rank != max(rank))) %>%
+    group_by(squirrel_id) %>%
+    mutate(rank =  dense_rank(date_new)) %>%
+    filter( (is.na(date_off) & rank != max(rank))) %>%
     ungroup() %>%
-    select_("squirrel_id", date = "date_new") %>%
-    inner_join(collars %>% filter_(~ radio == 1),
+    select("squirrel_id", date = "date_new") %>%
+    inner_join(collars %>% filter( radio == 1),
                by = c("squirrel_id", "date")) %>%
-    mutate_(check = ~ "check_collars_rcoff") %>%
+    mutate(check =  "check_collars_rcoff") %>%
     bind_rows(results, .)
   # now fill in gaps in timeline assuming date off is day before next rc new
   timeline <- timeline %>%
-    group_by_("squirrel_id") %>%
-    mutate_(date_lead = ~ (lead(date_new, 1, order_by = date_new) - 1),
-            date_off = ~ coalesce(date_off, date_lead,
+    group_by(squirrel_id) %>%
+    mutate(date_lead =  (lead(date_new, 1, order_by = date_new) - 1),
+            date_off =  coalesce(date_off, date_lead,
                                   lubridate::ymd("99991231"))) %>%
     ungroup() %>%
-    select_("squirrel_id", "date_new", "date_off")
+    select("squirrel_id", "date_new", "date_off")
 
   # collar records missing an rc new entry
   results <- collars %>%
-    filter_(~ radio %in% c(2, 3)) %>%
-    select_("id", "squirrel_id", "date") %>%
+    filter( radio %in% c(2, 3)) %>%
+    select("id", "squirrel_id", "date") %>%
     left_join(timeline, by = "squirrel_id") %>%
-    mutate_(has_new = ~ !(is.na(date_new) | date < date_new | date > date_off)) %>%
-    group_by_("id") %>%
-    summarize_(has_new = ~ any(has_new)) %>%
+    mutate(has_new =  !(is.na(date_new) | date < date_new | date > date_off)) %>%
+    group_by(id) %>%
+    summarize(has_new =  any(has_new)) %>%
     ungroup() %>%
-    filter_(~ !has_new) %>%
-    distinct_("id") %>%
+    filter( !has_new) %>%
+    distinct(id) %>%
     inner_join(collars, by = "id") %>%
-    mutate_(check = ~ "check_collars_rcnew") %>%
+    mutate(check =  "check_collars_rcnew") %>%
     bind_rows(results)
 
   # check for missing rc off record, signaled by non-collar records
   # find radio collars not removed that have a trapping record showing no collar
   results <- recent %>%
-    filter_(~ (is.na(radio) | radio == 5)) %>%
-    distinct_("squirrel_id", "date") %>%
+    filter( (is.na(radio) | radio == 5)) %>%
+    distinct(squirrel_id, date) %>%
     inner_join(timeline, by = "squirrel_id") %>%
     # cases with no rc removed
-    filter_(~ date_off == lubridate::ymd("99991231")) %>%
+    filter( date_off == lubridate::ymd("99991231")) %>%
     # ensure that last trap comes after rc new
-    filter_(~ date > date_new) %>%
+    filter( date > date_new) %>%
     # select original collar record
-    select_("squirrel_id", date = "date_new") %>%
-    inner_join(collars %>% filter_(~ radio == 1),
+    select("squirrel_id", date = "date_new") %>%
+    inner_join(collars %>% filter( radio == 1),
                by = c("squirrel_id", "date")) %>%
-    mutate_(check = ~ "check_collars_rcoff") %>%
+    mutate(check =  "check_collars_rcoff") %>%
     bind_rows(results, .)
 
   # convert radio codes to names
   results <- tibble(radio_code = as.character(1:5),
                     radio = c("new collar", "collar on", "collar change",
                               "collar removed", "no collar")) %>%
-    inner_join(results %>% rename_(radio_code = "radio"), by = "radio_code") %>%
-    left_join(recent %>% select_("squirrel_id", "colours", "tags", "loc"),
+    inner_join(results %>% rename(radio_code = "radio"), by = "radio_code") %>%
+    left_join(recent %>% select("squirrel_id", "colours", "tags", "loc"),
               by = "squirrel_id") %>%
-    select_("check", "id", "grid", "year", "observer",
+    select("check", "id", "grid", "year", "observer",
             "squirrel_id", "colours", "tags", "loc",
             "date", "radio", "collar") %>%
-    arrange_("grid", "year", "check", "date") %>%
-    as.tbl()
+    arrange("grid", "year", "check", "date")
   return(results)
 }
