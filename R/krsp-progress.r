@@ -32,16 +32,12 @@
 #'   head()
 #' krsp_progress(con, "KL", 2011)
 #' }
-krsp_progress <- function(con, grid, year, sex = c("F", "M", "Both"), 
-                          data = FALSE) {
-  UseMethod("krsp_progress")
-}
 
 #' @export
-krsp_progress.krsp <- function(con, grid, year = current_year(), 
+krsp_progress <- function(con, grid, year = current_year(), 
                                sex = c("F", "M", "Both"), data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               valid_year(year, single = TRUE),
               missing(grid) || valid_grid(grid))
   
@@ -75,8 +71,8 @@ krsp_progress.krsp <- function(con, grid, year = current_year(),
         GROUP BY squirrel_id)
       AND t.squirrel_id NOT IN (
         SELECT j.squirrel_id
-        FROM JUVENILE     j
-        LEFT JOIN LITTER  l
+        FROM juvenile     j
+        LEFT JOIN litter  l
           ON j.litter_id = l.id
         WHERE
           YEAR(COALESCE(fieldBDate, date1, tagDt)) = %i
@@ -86,8 +82,8 @@ krsp_progress.krsp <- function(con, grid, year = current_year(),
   suppressWarnings({
     squirrels <- krsp_sql(con, sq_query)
     litter <- tbl(con, "litter") %>%
-      filter_(~ yr == year) %>%
-      select_("id", "squirrel_id", "br", "ln",
+      filter( yr == year) %>%
+      select("id", "squirrel_id", "br", "ln",
               "fieldBDate", "date1", "tagDt") %>%
       collect()
   })
@@ -95,60 +91,60 @@ krsp_progress.krsp <- function(con, grid, year = current_year(),
   # remove multiple trapping records from same date
   squirrels <- squirrels %>%
     # remove dead squirrels
-    filter_(~ ft %in% 1:3) %>%
-    group_by_("squirrel_id") %>%
-    filter_(~ row_number() == 1) %>%
+    filter( ft %in% 1:3) %>%
+    group_by(squirrel_id) %>%
+    filter( row_number() == 1) %>%
     ungroup() %>% 
     # prepare tags, colours, and locs
-    mutate_(
-      trap_date = ~ suppressWarnings(as.Date(lubridate::ymd(trap_date))),
-      color_left = ~ ifelse(is.na(color_left) | color_left == "",
+    mutate(
+      trap_date =  suppressWarnings(as.Date(lubridate::ymd(trap_date))),
+      color_left =  ifelse(is.na(color_left) | color_left == "",
                             "-", color_left),
-      color_right = ~ ifelse(is.na(color_right) | color_right == "",
+      color_right =  ifelse(is.na(color_right) | color_right == "",
                              "-", color_right),
-      taglft = ~ ifelse(is.na(taglft) | taglft == "", "-", taglft),
-      tagrt = ~ ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
-      locx = ~ ifelse(is.na(locx) | locx == "", "-", locx),
-      locy = ~ ifelse(is.na(locy) | locy == "", "-", locy),
-      colours = ~ paste(color_left, color_right, sep = "/"),
-      tags = ~ paste(taglft, tagrt, sep = "/"),
-      loc = ~ paste(locx, locy, sep = "/"))
+      taglft =  ifelse(is.na(taglft) | taglft == "", "-", taglft),
+      tagrt =  ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
+      locx =  ifelse(is.na(locx) | locx == "", "-", locx),
+      locy =  ifelse(is.na(locy) | locy == "", "-", locy),
+      colours =  paste(color_left, color_right, sep = "/"),
+      tags =  paste(taglft, tagrt, sep = "/"),
+      loc =  paste(locx, locy, sep = "/"))
       
   # split male and female
-  females <- filter_(squirrels, ~ sex == "F")
-  males <- filter_(squirrels, ~ sex == "M")
+  females <- filter(squirrels,  sex == "F")
+  males <- filter(squirrels,  sex == "M")
   
   # bring in litter data for females
   rep_con_map <- c("P0", "P1", "P2", "P3")
   females <- left_join(females, litter, by = "squirrel_id") %>%
-    arrange_("squirrel_id", "ln") %>%
+    arrange(squirrel_id, ln) %>%
     # sort out the various permutations of data - messy!
-    mutate_(
-      ln = ~ as.character(ifelse(ln %in% 1:3, ln, NA)),
-      ln = ~ ifelse(is.na(id), "-", ln),
-      litter_date = ~ pmax(fieldBDate, date1, tagDt, na.rm = TRUE),
-      litter_date = ~ suppressWarnings(as.Date(lubridate::ymd(litter_date))),
-      litter_status = ~ ifelse(!is.na(tagDt), "N2",
+    mutate(
+      ln =  as.character(ifelse(ln %in% 1:3, ln, NA)),
+      ln =  ifelse(is.na(id), "-", ln),
+      litter_date =  pmax(fieldBDate, date1, tagDt, na.rm = TRUE),
+      litter_date =  suppressWarnings(as.Date(lubridate::ymd(litter_date))),
+      litter_status =  ifelse(!is.na(tagDt), "N2",
                                ifelse(!is.na(date1), "N1",
                                       ifelse(!is.na(fieldBDate), "Parturition", NA))),
       # use breeding status to assess non-breeders and lost litters
-      litter_status = ~ ifelse(br == 0 & is.na(litter_status), "Non-breeder",
+      litter_status =  ifelse(br == 0 & is.na(litter_status), "Non-breeder",
                                litter_status),
-      litter_status = ~ ifelse(br %in% c(2, 4, 7) & litter_status != "N2",
+      litter_status =  ifelse(br %in% c(2, 4, 7) & litter_status != "N2",
                                "LL", litter_status),
-      trap_status = ~ ifelse(!is.na(nipple) & nipple == 5, "LL",
+      trap_status =  ifelse(!is.na(nipple) & nipple == 5, "LL",
                              ifelse(is.na(rep_con) | !rep_con %in% 1:4, NA,
                                     rep_con_map[rep_con])),
       # nest record more recent than trap record
-      status = ~ ifelse(is.na(litter_status), trap_status, litter_status),
+      status =  ifelse(is.na(litter_status), trap_status, litter_status),
       # if trap later than nest and lost litter or pregnant, takes precedence
-      trap_precedence = ~ (is.na(litter_date) | litter_date < trap_date),
-      status = ~ ifelse(trap_precedence & trap_status != "P0", trap_status, status),
-      # status = ~ ifelse(trap_precedence & !is.na(litter_date) & litter_status == "N2",
+      trap_precedence =  (is.na(litter_date) | litter_date < trap_date),
+      status =  ifelse(trap_precedence & trap_status != "P0", trap_status, status),
+      # status =  ifelse(trap_precedence & !is.na(litter_date) & litter_status == "N2",
       #                   trap_status, status),
-      completion = ~ ifelse(status %in% c("LL", "N2", "P0", "Non-breeder"),
+      completion =  ifelse(status %in% c("LL", "N2", "P0", "Non-breeder"),
                             as.character(status), "In Progress")) %>%
-    select_("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
+    select("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
             litter_number = "ln",
             "status", "litter_status", "litter_date",
             "trap_status", "trap_date", "completion")
@@ -156,48 +152,48 @@ krsp_progress.krsp <- function(con, grid, year = current_year(),
   # process males
   rep_con_map <- c("S", "A")
   males <- males %>% 
-    mutate_(litter_number = ~ NA, litter_status = ~ NA, litter_date = NA,
-            completion = ~ "Male",
-            trap_status = ~ rep_con_map[rep_con],
-            status = ~ trap_status) %>%
-    select_("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
+    mutate(litter_number =  NA, litter_status =  NA, litter_date = NA,
+            completion =  "Male",
+            trap_status =  rep_con_map[rep_con],
+            status =  trap_status) %>%
+    select("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
             "litter_number", "status", "litter_status", "litter_date",
             "trap_status", "trap_date", "completion")
   
   squirrels <- bind_rows(females, males) %>% 
-    mutate_(
-      status = ~ factor(status,
+    mutate(
+      status =  factor(status,
                         levels = c("P3", "P2", "P1",
                                    "Parturition", "N1",
                                    "LL", "P0", "N2", "Non-breeder",
                                    "S", "A")),
-      trap_status = ~ factor(trap_status, levels = c(rev(rep_con_map), 
+      trap_status =  factor(trap_status, levels = c(rev(rep_con_map), 
                                                      "LL")),
-      completion = ~ factor(completion,
+      completion =  factor(completion,
                             levels = c("In Progress", "LL", "P0", "Non-breeder",
                                        "N2", "Male")),
-      litter_status = ~ factor(litter_status,
+      litter_status =  factor(litter_status,
                                levels = c("Parturition", "N1", "N2",
                                           "LL", "Non-breeder")))
   
   # target trap date
   squirrels <- squirrels %>%
-    mutate_(target_trap_date = ~ next_trap(as.character(status), trap_date))
+    mutate(target_trap_date =  next_trap(as.character(status), trap_date))
   # sensible ordering
   squirrels <- squirrels %>%
-    group_by_("squirrel_id") %>%
-    summarize_(arr_comp = ~ min(as.integer(completion), na.rm = TRUE),
-               arr_status = ~ min(as.integer(status), na.rm = TRUE)) %>%
+    group_by(squirrel_id) %>%
+    summarize(arr_comp =  min(as.integer(completion), na.rm = TRUE),
+               arr_status =  min(as.integer(status), na.rm = TRUE)) %>%
     inner_join(squirrels, by = "squirrel_id") %>%
-    arrange_("arr_comp", "arr_status", "squirrel_id", "litter_number") %>%
-    select_("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
+    arrange(arr_comp, arr_status, squirrel_id, litter_number) %>%
+    select("grid", "squirrel_id", "sex", "tags", "colours", "loc", 
             "litter_number", "status", "litter_status", "litter_date",
             "trap_status", "trap_date", "target_trap_date")
   
   if (sex == "F") {
-    squirrels <- filter_(squirrels, ~ sex == "F")
+    squirrels <- filter(squirrels,  sex == "F")
   } else if (sex == "M") {
-    squirrels <- filter_(squirrels, ~ sex == "M")
+    squirrels <- filter(squirrels,  sex == "M")
   }
   
   # return raw data frame or DataTable
