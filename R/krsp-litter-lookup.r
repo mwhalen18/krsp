@@ -15,13 +15,10 @@
 #' con <- krsp_connect()
 #' krsp_litter_lookup(con, year = 2013, squirrel_id = 11059, ln = 1)
 #' }
-krsp_litter_lookup <- function(con, year, squirrel_id, ln) {
-  UseMethod("krsp_litter_lookup")
-}
 
 #' @export
-krsp_litter_lookup.krsp <- function(con, year, squirrel_id, ln) {
-  assert_that(inherits(con, "src_dbi"),
+krsp_litter_lookup <- function(con, year, squirrel_id, ln) {
+  assert_that(inherits(con, "MySQLConnection"),
               valid_year(year, single = TRUE),
               is_integer(squirrel_id), length(squirrel_id) == 1,
               is_integer(ln), length(ln) == 1, ln < 5)
@@ -51,7 +48,7 @@ krsp_litter_lookup.krsp <- function(con, year, squirrel_id, ln) {
   if (n_distinct(nest$litter_id) > 1) {
     stop("Multiple matching nests.")
   }
-  as.tbl(nest)
+  tibble(nest)
 }
 
 # look up the last date pregnant before a litter and first date lac
@@ -63,22 +60,22 @@ lastpreg_firstlac <- function(con, sid, n1_date) {
   suppressWarnings({
     # all collar records from trapping
     trapping <- tbl(con, "trapping") %>%
-      mutate_(year = ~ year(date)) %>%
-      filter_(~ squirrel_id == sid,
-              ~ year == year_arg,
-              ~ rep_con %in% c(3, 4) | nipple == 4) %>%
-      select_("date", "rep_con", "nipple") %>%
+      mutate(year =  year(date)) %>%
+      filter( squirrel_id == sid,
+               year == year_arg,
+               rep_con %in% c(3, 4) | nipple == 4) %>%
+      select("date", "rep_con", "nipple") %>%
       collect()
   })
   # subset to within a month of n1
   trapping <- trapping %>%
-    filter_(~ date > n1_date - 15,
-            ~ date > n1_date + 15)
+    filter( date > n1_date - 15,
+             date > n1_date + 15)
   last_preg <- trapping %>%
-    filter_(~ rep_con %in% c(3, 4))
+    filter( rep_con %in% c(3, 4))
   last_preg <- if (nrow(last_preg) ==0) NA else max(last_preg$date)
   first_lac <- trapping %>%
-    filter_(~ nipple == 4)
+    filter( nipple == 4)
   first_lac <- if (nrow(first_lac) ==0) NA else min(first_lac$date)
   c(last_preg = last_preg, first_lac = first_lac)
 }
