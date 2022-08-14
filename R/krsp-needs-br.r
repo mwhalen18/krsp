@@ -16,14 +16,11 @@
 #' con <- krsp_connect()
 #' krsp_needs_br(con, 2015)
 #' }
-krsp_needs_br <- function(con, year) {
-  UseMethod("krsp_needs_br")
-}
 
 #' @export
-krsp_needs_br.krsp <- function(con, year = current_year()) {
+krsp_needs_br <- function(con, year = current_year()) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               valid_year(year))
 
   year <- as.integer(year)
@@ -31,25 +28,25 @@ krsp_needs_br.krsp <- function(con, year = current_year()) {
   # suppressWarnings to avoid typcasting warnings
   suppressWarnings({
     litter <- tbl(con, "litter") %>%
-      select_("squirrel_id", "br", "yr")
+      select("squirrel_id", "br", "yr")
     squirrel <- tbl(con, "squirrel")
   })
 
   # if-statment required due to dplyr bug with filter and %in%
   if (length(year) == 1) {
-    litter <- filter_(litter, ~ is.null(br), ~ yr == year)
+    litter <- filter(litter,  is.null(br),  yr == year)
   } else {
-    litter <- filter_(litter, ~ is.null(br), ~ yr %in% year)
+    litter <- filter(litter,  is.null(br),  yr %in% year)
   }
 
   inner_join(litter, squirrel, by = c("squirrel_id" = "id")) %>%
-    arrange_("gr", "trap_date") %>%
-    select_("gr",
+    arrange(gr, trap_date) %>%
+    select("gr",
            "squirrel_id",
            "colorlft", "colorrt",
            "taglft", "tagrt",
            "locx", "locy",
            "trap_date") %>%
     collect() %>%
-    mutate_(squirrel_id = ~ as.integer(squirrel_id))
+    mutate(squirrel_id =  as.integer(squirrel_id))
 }
