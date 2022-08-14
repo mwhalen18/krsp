@@ -25,15 +25,11 @@
 #'   head()
 #' krsp_censusmap(con, "KL", 2016, "august")
 #' }
-krsp_censusmap <- function(con, grid, year, census, data) {
-  UseMethod("krsp_censusmap")
-}
-
 #' @export
-krsp_censusmap.krsp <- function(con, grid, year, census = c("august", "may"),
+krsp_censusmap <- function(con, grid, year, census = c("august", "may"),
                                 data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               valid_year(year, single = TRUE), year > 2015,
               valid_grid(grid, single = TRUE),
               assertthat::is.flag(data))
@@ -61,37 +57,37 @@ krsp_censusmap.krsp <- function(con, grid, year, census = c("august", "may"),
   suppressWarnings({
     # get necessary tables from database
     census <- tbl(con, "census") %>%
-      filter_(~ gr == grid_choice,
-              ~ !is.na(reflo),
-              ~ sq_fate %in% valid_fates,
-              ~ census_date == this_census | census_date == last_census) %>%
-      select_("reflo", grid = "gr", "census_date", "locx", "locy",
+      filter( gr == grid_choice,
+               !is.na(reflo),
+               sq_fate %in% valid_fates,
+               census_date == this_census | census_date == last_census) %>%
+      select("reflo", grid = "gr", "census_date", "locx", "locy",
               "squirrel_id", fate = "sq_fate") %>%
       collect()
   })
 
   # process census
   census <- census %>%
-    mutate_(squirrel_id = ~ as.integer(squirrel_id),
-            locx = ~ loc_to_numeric(locx),
-            locy = ~ suppressWarnings(round(as.numeric(locy), 1)))
+    mutate(squirrel_id =  as.integer(squirrel_id),
+            locx =  loc_to_numeric(locx),
+            locy =  suppressWarnings(round(as.numeric(locy), 1)))
   # split into censuses
   census_last <- census %>%
-    filter_(~ census_date == last_census) %>%
-    select_(~ -census_date)
+    filter( census_date == last_census) %>%
+    select( -census_date)
   census_this <- census %>%
-    filter_(~ census_date == this_census) %>%
-    select_("reflo", locx_new = "locx", locy_new = "locy",
+    filter( census_date == this_census) %>%
+    select("reflo", locx_new = "locx", locy_new = "locy",
             squirrel_id_new = "squirrel_id", fate_new = "fate")
   # bring current fate into last census
   results <- left_join(census_last, census_this, by = "reflo") %>%
-    mutate_(locx = ~ if_else(is.na(locx) & is.na(locy), locx_new, locx),
-            locy = ~ if_else(is.na(locx) & is.na(locy), locy_new, locy)) %>%
-    filter_(~ !is.na(locx), ~ !is.na(locy)) %>%
-    select_("reflo", "grid", "locx", "locy",
+    mutate(locx =  if_else(is.na(locx) & is.na(locy), locx_new, locx),
+            locy =  if_else(is.na(locx) & is.na(locy), locy_new, locy)) %>%
+    filter( !is.na(locx),  !is.na(locy)) %>%
+    select("reflo", "grid", "locx", "locy",
             "squirrel_id", "squirrel_id_new",
             "fate", "fate_new") %>%
-    arrange_("locx", "locy")
+    arrange(locx, locy)
 
   # either return data frame or interactive map of census
   if (data) {
@@ -114,14 +110,14 @@ plot_census <- function(census, reverse_grid = FALSE) {
                 "#e377c2", "#bcbd22", NA)
   fates_lbl <- c(as.character(valid_fates), "tbd")
   census <- census %>%
-    mutate_(fate = ~ as.integer(fate),
-            fate_factor = ~ factor(coalesce(fate_new, 0L),
+    mutate(fate =  as.integer(fate),
+            fate_factor =  factor(coalesce(fate_new, 0L),
                                    levels = fates,
                                    labels = fates_lbl),
-            id = ~ row_number(),
-            censused = ~ if_else(!is.na(fate_new), "Yes", "No"),
-            censused = ~ factor(censused, levels = c("Yes", "No"))) %>%
-    rename_(x = "locx", y = "locy")
+            id =  row_number(),
+            censused =  if_else(!is.na(fate_new), "Yes", "No"),
+            censused =  factor(censused, levels = c("Yes", "No"))) %>%
+    rename(x = locx, y = locy)
   # create interactive plot
   popup <- function(x) {
     row <- census[census$id == x$id, ]
@@ -139,7 +135,7 @@ plot_census <- function(census, reverse_grid = FALSE) {
   x_ticks <- floor(min(census$x)):ceiling(max(census$x))
   y_ticks <- floor(min(census$y)):ceiling(max(census$y))
   # letter labels for x-axis
-  x_labels <- data_frame(x = x_ticks + ifelse(reverse_grid, 0.2, -0.2),
+  x_labels <- tibble(x = x_ticks + ifelse(reverse_grid, 0.2, -0.2),
                          y = ceiling(max(census$y)),
                          label = sapply(x_ticks, function(i) {
                            ifelse(i > 0 & i <= 26, LETTERS[i], i)
