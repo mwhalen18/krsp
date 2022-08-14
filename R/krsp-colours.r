@@ -21,14 +21,11 @@
 #' con <- krsp_connect()
 #' krsp_colours(con, grid = "KL", year = 2014)
 #' }
-krsp_colours <- function(con, grid, year) {
-  UseMethod("krsp_colours")
-}
 
 #' @export
-krsp_colours.krsp <- function(con, grid, year = current_year()) {
+krsp_colours <- function(con, grid, year = current_year()) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               valid_grid(grid, single = TRUE),
               valid_year(year, single = TRUE))
   year_arg <- as.integer(year)
@@ -79,19 +76,19 @@ krsp_colours.krsp <- function(con, grid, year = current_year()) {
   juveniles <- krsp_sql(con, juve_query)
   # remove duplicate entries for squirrels
   recent <- recent %>%
-    arrange_(~ desc(id)) %>%
+    arrange(desc(id)) %>%
     # remove dead squirrels
-    filter_(~ ft %in% 1:3) %>%
-    group_by_("squirrel_id") %>%
-    filter_(~ row_number() == 1) %>%
+    filter( ft %in% 1:3) %>%
+    group_by(squirrel_id) %>%
+    filter( row_number() == 1) %>%
     ungroup() %>%
-    select_(~ -id, ~ -ft)
+    select( -id,  -ft)
   # combine litter and trapping data
   trap_lit <- bind_rows(juveniles, recent) %>%
     # only keep most recent between trapping and litter
-    group_by_("squirrel_id") %>%
-    arrange_(~ desc(date)) %>%
-    filter_(~ row_number() == 1) %>%
+    group_by(squirrel_id) %>%
+    arrange( desc(date)) %>%
+    filter( row_number() == 1) %>%
     ungroup()
   if (!is.data.frame(trap_lit) | nrow(trap_lit) == 0) {
     return(as.tbl(data.frame(
@@ -99,52 +96,52 @@ krsp_colours.krsp <- function(con, grid, year = current_year()) {
     )))
   }
   results <- trap_lit %>%
-    mutate_(
-      juvenile = ~ (juvenile == 1),
-      color_left = ~ toupper(color_left),
-      color_left = ~ gsub("BK", "Bk", color_left),
-      color_left = ~ gsub("GY", "Gy", color_left),
-      color_left = ~ ifelse(is.na(color_left) | color_left == "",
+    mutate(
+      juvenile =  (juvenile == 1),
+      color_left =  toupper(color_left),
+      color_left =  gsub("BK", "Bk", color_left),
+      color_left =  gsub("GY", "Gy", color_left),
+      color_left =  ifelse(is.na(color_left) | color_left == "",
                             "-", color_left),
-      color_right = ~ toupper(color_right),
-      color_right = ~ gsub("BK", "Bk", color_right),
-      color_right = ~ gsub("GY", "Gy", color_right),
-      color_right = ~ ifelse(is.na(color_right) | color_right == "",
+      color_right =  toupper(color_right),
+      color_right =  gsub("BK", "Bk", color_right),
+      color_right =  gsub("GY", "Gy", color_right),
+      color_right =  ifelse(is.na(color_right) | color_right == "",
                              "-", color_right),
-      taglft = ~ ifelse(is.na(taglft) | taglft == "", "-", taglft),
-      tagrt = ~ ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
-      locx = ~ ifelse(is.na(locx) | locx == "", "-", locx),
-      locy = ~ ifelse(is.na(locy) | locy == "", "-", locy),
-      colours = ~ paste(color_left, color_right, sep = "/"),
-      tags = ~ paste(taglft, tagrt, sep = "/"),
-      loc = ~ paste(locx, locy, sep = "/"),
-      reflo = ~ as_reflo(locx, locy)) %>%
-    rename_(left = "color_left", right = "color_right")
+      taglft =  ifelse(is.na(taglft) | taglft == "", "-", taglft),
+      tagrt =  ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
+      locx =  ifelse(is.na(locx) | locx == "", "-", locx),
+      locy =  ifelse(is.na(locy) | locy == "", "-", locy),
+      colours =  paste(color_left, color_right, sep = "/"),
+      tags =  paste(taglft, tagrt, sep = "/"),
+      loc =  paste(locx, locy, sep = "/"),
+      reflo =  as_reflo(locx, locy)) %>%
+    rename(left = color_left, right = color_right)
   # find duplicate coloured squirrels
   results <- results %>%
-    group_by_("left", "right") %>%
-    mutate_(duplicate = ~ (n() > 1)) %>%
+    group_by(left, right) %>%
+    mutate(duplicate =  (n() > 1)) %>%
     ungroup()
   # identify non-standard and bad colours
   # replace two letter colours
   results <- results %>%
     # identify invalid colours
-    mutate_(valid = ~ grepl("^(([BRGYOWP]|Bk|Gy)[!*]?){1,2}$", left) | left == "-",
-            valid = ~ valid & (grepl("^(([BRGYOWP]|Bk|Gy)[!*]?){1,2}$", right) | right == "-")) %>%
+    mutate(valid =  grepl("^(([BRGYOWP]|Bk|Gy)[!*]?){1,2}$", left) | left == "-",
+            valid =  valid & (grepl("^(([BRGYOWP]|Bk|Gy)[!*]?){1,2}$", right) | right == "-")) %>%
     # non-standard colours combos
-    mutate_(stdf = ~ grepl("^([BRGYOWP]|Bk|Gy)$", left) | left == "-",
-            stdf = ~ stdf & (grepl("^([BRGYOWP]|Bk|Gy)$", right) | right == "-"),
-            stdm = ~ grepl("^([BRGYOWP]|Bk|Gy)[!]$", left) | left == "-",
-            stdm = ~ stdm & (grepl("^([BRGYOWP]|Bk|Gy)[!]$", right) | right == "-"),
-            stdj = ~ grepl("^([BRGYOWP]|Bk|Gy)[*]$", left) | left == "-",
-            stdj = ~ stdj & (grepl("^([BRGYOWP]|Bk|Gy)[*]$", right) | right == "-"),
-            standard = ~ (sex == "M" & !juvenile & stdm),
-            standard = ~ standard | (sex == "F" & !juvenile & stdf),
-            standard = ~ standard | (juvenile & stdj),
-            standard = ~ coalesce(standard, FALSE)) %>%
-    select_("left", "right", "squirrel_id", "sex", "juvenile",
+    mutate(stdf =  grepl("^([BRGYOWP]|Bk|Gy)$", left) | left == "-",
+            stdf =  stdf & (grepl("^([BRGYOWP]|Bk|Gy)$", right) | right == "-"),
+            stdm =  grepl("^([BRGYOWP]|Bk|Gy)[!]$", left) | left == "-",
+            stdm =  stdm & (grepl("^([BRGYOWP]|Bk|Gy)[!]$", right) | right == "-"),
+            stdj =  grepl("^([BRGYOWP]|Bk|Gy)[*]$", left) | left == "-",
+            stdj =  stdj & (grepl("^([BRGYOWP]|Bk|Gy)[*]$", right) | right == "-"),
+            standard =  (sex == "M" & !juvenile & stdm),
+            standard =  standard | (sex == "F" & !juvenile & stdf),
+            standard =  standard | (juvenile & stdj),
+            standard =  coalesce(standard, FALSE)) %>%
+    select("left", "right", "squirrel_id", "sex", "juvenile",
             "tags", "colours", "loc", "reflo",
             last_trapped = "date", "standard", "duplicate", "valid") %>%
-    arrange_("juvenile", "sex", "left", "right")
-  as.tbl(results)
+    arrange(juvenile, sex, left, right)
+  tibble(results)
 }
