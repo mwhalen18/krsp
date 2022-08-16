@@ -5,7 +5,7 @@
 #' * `annual_cone_counts()` computes cone counts by year
 #' * `grids_cones_years()` computes cone counts by grid and year
 #' 
-#' @param con A \code{MySQLConnection} connection to the KRSP database
+#' @param con A `MySQLConnection` connection to the KRSP database
 #' @param grids character; one or more grids to search. Defaults to all grids.
 #' @param years integer; one or more years to search within. Defaults to all years
 #' @returns A `tbl_MySQLConnection` query that can be gathered into memory using `collect()`

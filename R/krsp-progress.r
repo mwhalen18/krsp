@@ -21,8 +21,8 @@
 #' @param sex character; whether to return females, males, or both.
 #' @param data logical; if TRUE return data frame instead of plotting
 #'
-#' @return Displays and returns a \code{ggvis} plot of seasonal workflow 
-#'   progress for all squirrels, unless \code{data} is TRUE, in which case a
+#' @return Displays and returns a `ggvis` plot of seasonal workflow 
+#'   progress for all squirrels, unless `data` is TRUE, in which case a
 #'   data frame is returned and nothing is plotted.
 #' @export
 #' @examples

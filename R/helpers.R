@@ -1,10 +1,10 @@
 #' code mast years by year
-#' @usage \code{code_mast_years(.tbl, .gridCol, .yearCol)}
+#' @usage `code_mast_years(.tbl, .gridCol, .yearCol)`
 #' @param .tbl A dataframe to calculate mast years
 #' @param .gridCol a column to extract grid names from. Can accept standard and non-standard evaluated column names
 #' @param .yearCol a column to extract years from. Can accept standard and non standard evaluated column names
-#' @details The output of \code{code_mast_years()} will contain columns 'mast', 'Exp', and 'EXP_label'
-#' @Value Returns a \code{data.frame} or \code{tbl_df} object passed as an argument as \code{.tbl}
+#' @details The output of `code_mast_years()` will contain columns 'mast', 'Exp', and 'EXP_label'
+#' @Value Returns a `data.frame` or `tbl_df` object passed as an argument as `.tbl`
 #' @examples
 #' \dontrun {
 #' con <- krsp_connect(group = 'krsp-aws')

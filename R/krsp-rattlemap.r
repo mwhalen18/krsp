@@ -3,12 +3,12 @@
 #' Create an interative plot of rattle or feeding behaviour on given grid and in
 #' given year. In the plot, squirrels are colour coded, sex is distinguished by
 #' different symbols, and further information is available in a tool tip on
-#' mouseover. Plotting is done using \code{ggvis}, which creates an HTML object
+#' mouseover. Plotting is done using `ggvis`, which creates an HTML object
 #' that pops up in the Viewer pane in RStudio.
 #'
-#' Records can be further filtered to a date range using the \code{date_range}
+#' Records can be further filtered to a date range using the `date_range`
 #' arguments, which is a vector of the from and to dates, respectively, both of
-#' which must be in the same year. If \code{date_range} is provided is ignored.
+#' which must be in the same year. If `date_range` is provided is ignored.
 #'
 #' @param con Connection to KRSP database
 #' @param grid character; a single grid to map
@@ -17,17 +17,17 @@
 #'   character representation of date in YMD format (e.g. "2016-05-25"); only
 #'   show records that are between these dates.
 #' @param locx_range vector of length 2 giving upper and lower bounds of x locs,
-#'   either as character (e.g. \code{c("A", "H.5")}) or numeric (e.g.
-#'   \code{5.5, 10}).
+#'   either as character (e.g. `c("A", "H.5")`) or numeric (e.g.
+#'   `5.5, 10`).
 #' @param locy_range vector of length 2 giving upper and lower bounds of y locs,
-#'   either as character (e.g. \code{c("5", "10.5")}) or numeric (e.g.
-#'   \code{5, 10.5}).
+#'   either as character (e.g. `c("5", "10.5")`) or numeric (e.g.
+#'   `5, 10.5`).
 #' @param middens character; whether to show middens from the August ("august")
 #'   census, the May census ("may"), or not display middens at all ("none").
 #' @param data logical; if TRUE return data frame instead of plotting
 #'
-#' @return Displays and returns a \code{ggvis} plot of rattle locations, unless
-#'   \code{data} is TRUE, in which case a data frame is returned and nothing is
+#' @return Displays and returns a `ggvis` plot of rattle locations, unless
+#'   `data` is TRUE, in which case a data frame is returned and nothing is
 #'   plotted.
 #' @export
 #' @examples

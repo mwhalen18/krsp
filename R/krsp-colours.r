@@ -8,10 +8,10 @@
 #' @param year integer; year to display colour key for. Defaults to current year.
 #'
 #' @return A data frame allowing identification of squirrels by colours. In this
-#'   data frame there are three flags: \code{valid} indicates whether the
+#'   data frame there are three flags: `valid` indicates whether the
 #'   colours are valid (allowing for at most 2 colours per ear),
-#'   \code{duplicate} indicates whether that combination of colours is used on
-#'   multiple squirrels, and \code{standard} indicates whether a squirrel has
+#'   `duplicate` indicates whether that combination of colours is used on
+#'   multiple squirrels, and `standard` indicates whether a squirrel has
 #'   standard colouring, i.e. one colour in each ear and no mixing of wires,
 #'   pipes, and discs.
 #'

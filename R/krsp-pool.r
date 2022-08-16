@@ -1,13 +1,13 @@
 #' Create krsp connection from a Pool
 #'
-#' The \code{pool} package is designed for managing database connectinos in
+#' The `pool` package is designed for managing database connectinos in
 #' Shiny apps when multiple users may be creating connections to the database
-#' simultaneously. This wrapper function for \code{\link[pool]{src_pool}}
-#' returns a \code{krsp} database connection object from a pool.
+#' simultaneously. This wrapper function for [pool::src_pool()]
+#' returns a `krsp` database connection object from a pool.
 #'
-#' @param pool A \code{pool} object.
+#' @param pool A `pool` object.
 #'
-#' @return A connection to the krsp database for use with \code{dplyr}.
+#' @return A connection to the krsp database for use with `dplyr`.
 #' @export
 #' @examples
 #' \dontrun{

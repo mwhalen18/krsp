@@ -1,14 +1,14 @@
 #' Connect to the krsp database
 #'
-#' \code{krsp_connect} is a wrapper for \code{\link[DBI]{dbConnect}} that
+#' `krsp_connect` is a wrapper for [DBI::dbConnect()] that
 #' connects to the KRSP database. By default, this function will connect to a
 #' local copy of the database as root user with no password. When connecting to
 #' a remote database, the host, username, and password must be supplied. This
-#' information can be passed as parameters to \code{krsp_connect}, however, it's
+#' information can be passed as parameters to `krsp_connect`, however, it's
 #' much safer to store these authentication parameters in a my.cnf file. Consult
 #' the vignette for this package for further details.
 #'
-#' @param dbname database name; defaults to \code{krsp}
+#' @param dbname database name; defaults to `krsp`
 #' @param host,port character; host name and port of krsp database. Defaults to a local
 #'    instance of the database.
 #' @param user,password character; username and password. For a local instance of the
@@ -16,9 +16,9 @@
 #'    instance of the krsp database these will be user specific and must be
 #'    supplied.
 #' @param group character; my.cnf option group
-#' @param ... Additional arguments passed on to \code{\link[DBI]{dbConnect}}.
+#' @param ... Additional arguments passed on to [DBI::dbConnect()].
 #'
-#' @return A connection to the krsp database for use with \code{dplyr}.
+#' @return A connection to the krsp database for use with `dplyr`.
 #' @export
 #' @examples
 #' \dontrun{
@@ -42,4 +42,11 @@ krsp_connect <- function(dbname = "krsp", host = "localhost", port = 0L,
     #                  user = NULL, ...)
   }
   return(con)
+}
+
+#' @export
+krsp_reconnect <- function(con, ...) {
+  dbDisconnect(con)
+  
+  con <- krsp_connect(...)
 }

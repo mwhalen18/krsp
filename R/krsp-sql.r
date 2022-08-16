@@ -1,7 +1,7 @@
 #' Run SQL query on database
 #'
 #' Run a pure SQL query on the KRSP database and return a data frame. To avoid
-#' accidentally changing the database, only \code{SELECT} queries are permitted.
+#' accidentally changing the database, only `SELECT` queries are permitted.
 #'
 #' @param con Connection to KRSP database
 #' @param sql SQL query to execute

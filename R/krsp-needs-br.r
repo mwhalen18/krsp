@@ -1,7 +1,7 @@
 #' Identify squirrels without breeding status
 #'
-#' Identify female squirrels who are missing a breeding status (\code{br} in the
-#' \code{litter} table) in the given year. Note that all squirrels should
+#' Identify female squirrels who are missing a breeding status (`br` in the
+#' `litter` table) in the given year. Note that all squirrels should
 #' appear in the litter table and have a breeding status even if they did not
 #' breed in a given year.
 #'

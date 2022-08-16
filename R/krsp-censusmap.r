@@ -16,7 +16,7 @@
 #' @param data logical; whether to just return the data instead of a plot.
 #'
 #' @return An interactive plot comparing censuses, or a data frame if
-#'   \code{data == TRUE}.
+#'   `data == TRUE`.
 #' @export
 #' @examples
 #' \dontrun{

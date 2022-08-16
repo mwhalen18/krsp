@@ -1,14 +1,14 @@
 #' Launch the Shiny Squirrels dashboard
 #'
 #' This Shiny app requires a connection to the KRSP database, which can be
-#' accomplished in one of two ways. Either using using \code{location} to choose
+#' accomplished in one of two ways. Either using using `location` to choose
 #' one of the predefined connection settings or by setting the database name,
 #' host, username, and password directly.
 #'
 #' @param location string; choose one of the predefined database connection
 #'   settings. "local" will connect to a local copy of the database as root user
 #'   with no password. "camp" is to be used at camp to connect to the database
-#'   on the head tech computer over the local network. If \code{location} is
+#'   on the head tech computer over the local network. If `location` is
 #'   set, then all other parameters are ignored.
 #' @param dbname string; the name of the database to connect to, typically
 #'   "krsp".

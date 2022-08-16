@@ -1,7 +1,7 @@
 #' Check records in trapping table
 #'
 #' Perform data integrity checks on the trapping table. Run all checks at once
-#' with \code{check_trapping()}, or perform individual checks with the specific
+#' with `check_trapping()`, or perform individual checks with the specific
 #' functions outlined below.
 #'
 #' @param con Connection to KRSP database
@@ -20,27 +20,27 @@
 #' The following checks have been implemented:
 #'
 #' \itemize{
-#'   \item \code{check_trapping_loc}: all locs should conform to the standard
-#'     format for reflos, e.g. A.5, 22.0, or -1.5. Use \code{reflo = FALSE} to
+#'   \item `check_trapping_loc`: all locs should conform to the standard
+#'     format for reflos, e.g. A.5, 22.0, or -1.5. Use `reflo = FALSE` to
 #'     allow any valid loc instead of just reflos.
-#'   \item \code{check_trapping_colours}: check for valid colours.
-#'   \item \code{check_trapping_tags}: check for valid tags, i.e. a letter
+#'   \item `check_trapping_colours`: check for valid colours.
+#'   \item `check_trapping_tags`: check for valid tags, i.e. a letter
 #'     followed by 4 numbers.
-#'   \item \code{check_trapping_weight}: highlight records with suspicious bag
+#'   \item `check_trapping_weight`: highlight records with suspicious bag
 #'     or squirrel weights. In general, bags should be between 75 and 170 grams
-#'     and squirrels between 70 and 390 grams. If \code{missing_wt = TRUE}, also
+#'     and squirrels between 70 and 390 grams. If `missing_wt = TRUE`, also
 #'     highlight squirrels with missing or zero weights, unless the comments
 #'     suggest they were released without handling. By default missing weights
 #'     are not highlighted because there are many cases where weights are
 #'     intentionally not taken.
-#'   \item \code{check_trapping_collwt}: any squirrel with collar fate of 2
+#'   \item `check_trapping_collwt`: any squirrel with collar fate of 2
 #'     ("rc on"), 3 ("rc off"), or 4 ("rc change") should have a collar weight
 #'     of either 4 or 8 grams entered.
-#'   \item \code{check_trapping_dna}: DNA vial numbers should be composed of
+#'   \item `check_trapping_dna`: DNA vial numbers should be composed of
 #'     the grid, followed by the 2 digit year, then 4 numbers, e.g. KL151234.
-#'   \item \code{check_trapping_newdna}: all newly caught squirrels and
+#'   \item `check_trapping_newdna`: all newly caught squirrels and
 #'     squirrels with ripped tags in both ears (i.e. RIP/RIP) should have DNA.
-#'   \item \code{check_trapping_fate}: all trapping records should have an
+#'   \item `check_trapping_fate`: all trapping records should have an
 #'     associated fate. In most cases, this function identifies cases where
 #'     the observer forgot to enter the "recap" fate.
 #' }

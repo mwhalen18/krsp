@@ -1,7 +1,7 @@
 #' Check records in behaviour table
 #'
 #' Perform data integrity checks on the behaviour table. Run all checks at once
-#' with \code{check_bahaviour()}, or perform individual checks with the specific
+#' with `check_bahaviour()`, or perform individual checks with the specific
 #' functions outlined below.
 #'
 #' @param con Connection to KRSP database
@@ -16,11 +16,11 @@
 #' The following checks have been implemented:
 #'
 #' \itemize{
-#'   \item \code{check_behaviour_loc}: all locs should conform to the standard
+#'   \item `check_behaviour_loc`: all locs should conform to the standard
 #'     format, e.g. A.1, 22.1, or -1.8.
-#'   \item \code{check_behaviour_mode}: the \code{mode} of the observation, i.e.
+#'   \item `check_behaviour_mode`: the `mode` of the observation, i.e.
 #'     how it was taken, should never be empty.
-#'   \item \code{check_behaviour_time}: in general, behaviour observations
+#'   \item `check_behaviour_time`: in general, behaviour observations
 #'     should all be taken between between 6am and 10pm, with the exception of
 #'     nest locs, which may be night locs.
 #' }
