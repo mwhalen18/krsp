@@ -10,12 +10,7 @@
 #' krsp_tables(con)
 #' }
 krsp_tables <- function(con) {
-  UseMethod("krsp_tables")
-}
-
-#' @export
-krsp_tables.krsp <- function(con) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"))
-  src_tbls(con)
+  assert_that(inherits(con, "MySQLConnection"))
+  DBI::dbListTables(con)
 }

@@ -1,13 +1,15 @@
+#' Calculate KRSP pedigree
+#' 
+#' `r lifecycle::badge("experimental")`
+#' 
 #' @description This function will create a pedigree from the flastall2 table in the cloud version of the krsp database.  
 #' The pedigree will be called 'krsp_pedigree'.  flastall2 contains all squirrels born in the study (including those not tagged).
-#' `r lifecycle::badge("experimental")`
+#' Note this code untested
 #' @param con a `MySQLConnection` connection to the krsp database
 #' @param ... reserved for future extensions
 #' 
-#' Note this code untested
 #' @export
 krsp_pedigree <- function(con, ...) {
-  require(kinship2)
 
   ped<-tbl(con, "flastall2") %>% 
     select(id=squirrel_id, dam=dam_id, sire=sire_id) %>% 
@@ -48,7 +50,7 @@ krsp_pedigree <- function(con, ...) {
       IDs$dam<-Ped$dam[match(IDs$id,Ped$id)]
       IDs$sire<-Ped$sire[match(IDs$id,Ped$id)]
       orderPed<-function(ped){
-        reorder<-ped[order(kindepth(ped[,1],ped[,2],ped[,3]), decreasing=FALSE),]
+        reorder<-ped[order(kinship2::kindepth(ped[,1],ped[,2],ped[,3]), decreasing=FALSE),]
         return(reorder)
       }
       fixedPedigree<-orderPed(IDs)

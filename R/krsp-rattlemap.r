@@ -43,18 +43,11 @@
 #'   locy_range = c(5, 10))
 #' }
 krsp_rattlemap <- function(con, grid, year, date_range,
-                           locx_range, locy_range,
-                           middens, data) {
-  UseMethod("krsp_rattlemap")
-}
-
-#' @export
-krsp_rattlemap.krsp <- function(con, grid, year, date_range,
                                 locx_range, locy_range,
                                 middens = c("none", "august", "may"),
                                 data = FALSE) {
   # assertions on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(year) || valid_year(year, single = TRUE),
               missing(date_range) || length(date_range) == 2,
               missing(locx_range) || length(locx_range) == 2,
@@ -116,18 +109,18 @@ krsp_rattlemap.krsp <- function(con, grid, year, date_range,
   suppressWarnings({
     # get necessary tables from database
     behaviour <- tbl(con, "behaviour") %>%
-      filter_(~ grid == grid_choice,
-              ~ year(date) == year,
-              ~ mode %in% c(1L, 4L),
-              ~ behaviour == 2L,
-              ~ detail == 1L) %>%
-      select_("squirrel_id", "grid", "locx", "locy", "date") %>%
+      filter( grid == grid_choice,
+               year(date) == year,
+               mode %in% c(1L, 4L),
+               behaviour == 2L,
+               detail == 1L) %>%
+      select("squirrel_id", "grid", "locx", "locy", "date") %>%
       collect()
     trapping <- tbl(con, "trapping") %>%
-      filter_(~ gr == grid_choice,
-              ~ year(date) == year,
-              ~ rattle == "R") %>%
-      select_("squirrel_id", grid = "gr", "locx", "locy", "date") %>%
+      filter( gr == grid_choice,
+               year(date) == year,
+               rattle == "R") %>%
+      select("squirrel_id", grid = "gr", "locx", "locy", "date") %>%
       collect()
     recent <- krsp_sql(con, recent_query)
     if (middens != "none") {
@@ -137,54 +130,54 @@ krsp_rattlemap.krsp <- function(con, grid, year, date_range,
         cdate <- paste0(year, "-05-15")
       }
       census <- tbl(con, "census") %>%
-        filter_(~ gr == grid_choice,
-                ~ census_date == cdate) %>%
-        select_("squirrel_id", grid = "gr", "locx", "locy",
+        filter( gr == grid_choice,
+                 census_date == cdate) %>%
+        select("squirrel_id", grid = "gr", "locx", "locy",
                 date = "census_date") %>%
         collect()
     }
   })
   results_b <- inner_join(behaviour, recent, by = "squirrel_id") %>%
-    mutate_(source = ~ "behaviour")
+    mutate(source =  "behaviour")
   results_t <- inner_join(trapping, recent, by = "squirrel_id") %>%
-    mutate_(source = ~ "trapping")
+    mutate(source =  "trapping")
   results <- bind_rows(results_t, results_b)
   if (middens != "none") {
     results_m <- inner_join(census, recent, by = "squirrel_id") %>%
-      mutate_(source = ~ "census")
+      mutate(source =  "census")
     results <- bind_rows(results, results_m)
   }
   # full list of rattles and corresponding squirrel info
   results <- results %>%
-    mutate_(squirrel_id = ~ as.integer(squirrel_id),
-            x = ~ loc_to_numeric(locx),
-            y = ~ suppressWarnings(round(as.numeric(locy), 1)),
-            date = ~ suppressWarnings(as.Date(lubridate::ymd(date))),
-            color_left = ~ ifelse(is.na(color_left) | color_left == "",
+    mutate(squirrel_id =  as.integer(squirrel_id),
+            x =  loc_to_numeric(locx),
+            y =  suppressWarnings(round(as.numeric(locy), 1)),
+            date =  suppressWarnings(as.Date(lubridate::ymd(date))),
+            color_left =  ifelse(is.na(color_left) | color_left == "",
                                   "-", color_left),
-            color_right = ~ ifelse(is.na(color_right) | color_right == "",
+            color_right =  ifelse(is.na(color_right) | color_right == "",
                                    "-", color_right),
-            taglft = ~ ifelse(is.na(taglft) | taglft == "", "-", taglft),
-            tagrt = ~ ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
-            colours = ~ paste(color_left, color_right, sep = "/"),
-            tags = ~ paste(taglft, tagrt, sep = "/"),
-            sex = ~ factor(coalesce(sex, "?"),
+            taglft =  ifelse(is.na(taglft) | taglft == "", "-", taglft),
+            tagrt =  ifelse(is.na(tagrt) | tagrt == "", "-", tagrt),
+            colours =  paste(color_left, color_right, sep = "/"),
+            tags =  paste(taglft, tagrt, sep = "/"),
+            sex =  factor(coalesce(sex, "?"),
                            levels = c("F", "M", "?"))) %>%
-    filter_(~ !is.na(x), ~ !is.na(y)) %>%
-    mutate_(id = ~ row_number()) %>%
-    select_("id", "squirrel_id", "x", "y", "grid", "sex",
+    filter( !is.na(x),  !is.na(y)) %>%
+    mutate(id =  row_number()) %>%
+    select("id", "squirrel_id", "x", "y", "grid", "sex",
             "colours", "tags", "date", "trap_date", "source")
 
   # date filtering
   if (!missing(date_range)) {
-    results <- filter_(results, ~ date >= from_date, ~ date <= to_date)
+    results <- filter(results,  date >= from_date,  date <= to_date)
   }
   # loc filtering
   if (!missing(locx_range)) {
-    results <- filter_(results, ~ x >= locx_range[1], ~ x <= locx_range[2])
+    results <- filter(results,  x >= locx_range[1],  x <= locx_range[2])
   }
   if (!missing(locy_range)) {
-    results <- filter_(results, ~ y >= locy_range[1], ~ y <= locy_range[2])
+    results <- filter(results,  y >= locy_range[1],  y <= locy_range[2])
   }
 
   # either return data frame or interactive map of rattles
@@ -202,13 +195,13 @@ plot_rattles <- function(rattles, reverse_grid = FALSE) {
   }
   # create squirrel_id factor variable for colouring
   rattles <- rattles %>%
-    mutate_(sid = ~ factor(squirrel_id))
+    mutate(sid =  factor(squirrel_id))
   # middens present?
   all_data <- rattles
   middens <- rattles %>%
-    filter_(~ source == "census")
+    filter( source == "census")
   rattles <- rattles %>%
-    filter_(~ source != "census")
+    filter( source != "census")
   # create interactive plot
   popup <- function(x) {
     row <- rattles[all_data$id == x$id, ]
@@ -229,13 +222,13 @@ plot_rattles <- function(rattles, reverse_grid = FALSE) {
                            ifelse(i > 0 & i <= 26, LETTERS[i], i)
                          })
   )
-  g <- ggvis::ggvis(rattles, ~x, ~y) %>%
-    ggvis::layer_points(fill = ~sid, shape = ~sex,
-                        key := ~id, opacity := 0.7) %>%
+  g <- ggvis::ggvis(rattles, x, y) %>%
+    ggvis::layer_points(fill = sid, shape = sex,
+                        key := id, opacity := 0.7) %>%
     # assign shapes to sexes
     ggvis::scale_nominal("shape", range = c("circle", "square", "diamond")) %>%
     # labels for x loc letters
-    ggvis::layer_text(~x, ~y, text := ~label,
+    ggvis::layer_text(x, y, text := label,
                       fontSize := 14, fontWeight := "bold",
                       data = x_labels) %>%
     # main x-axis
@@ -277,8 +270,8 @@ plot_rattles <- function(rattles, reverse_grid = FALSE) {
     ggvis::set_options(height = 650, width = 900)
 
   # add middens locations if requested
-  g <- ggvis::layer_points(vis = g, data = middens, stroke = ~sid,
-                           fill := NA, shape = ~sex) %>%
+  g <- ggvis::layer_points(vis = g, data = middens, stroke = sid,
+                           fill := NA, shape = sex) %>%
     ggvis::hide_legend("stroke")
   return(g)
 }

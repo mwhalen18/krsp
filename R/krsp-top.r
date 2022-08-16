@@ -17,13 +17,8 @@
 #'   head()
 #' }
 krsp_top <- function(con, year) {
-  UseMethod("krsp_top")
-}
-
-#' @export
-krsp_top.krsp <- function(con, year) {
   # assertion on arguments
-  assert_that(inherits(con, "src_dbi"),
+  assert_that(inherits(con, "MySQLConnection"),
               missing(year) || valid_year(year, single = TRUE))
   if (!missing(year)) {
     year_arg <- as.integer(year)
@@ -33,13 +28,13 @@ krsp_top.krsp <- function(con, year) {
   suppressWarnings({
     # trapping
     trapping <- tbl(con, "trapping") %>%
-      filter_(~ ft %in% c(1, 2, 3, 7, 13),
-              ~ !is.na(obs),
-              ~ obs != "") %>%
+      filter( ft %in% c(1, 2, 3, 7, 13),
+               !is.na(obs),
+               obs != "") %>%
       rename_(observer = "obs")
     if (!missing(year)) {
       trapping <- trapping %>%
-        filter_(~ year(date) == year_arg)
+        filter( year(date) == year_arg)
     }
     trapping <- trapping %>%
       count_("observer") %>%
@@ -47,12 +42,12 @@ krsp_top.krsp <- function(con, year) {
       collect()
     # behaviour
     behaviour <- tbl(con, "behaviour") %>%
-      filter_(~ mode == 1,
-              ~ !is.na(observer),
-              ~ observer != "")
+      filter( mode == 1,
+               !is.na(observer),
+               observer != "")
     if (!missing(year)) {
       behaviour <- behaviour %>%
-        filter_(~ year(date) == year_arg)
+        filter( year(date) == year_arg)
     }
     behaviour <- behaviour %>%
       count_("observer") %>%
@@ -60,13 +55,13 @@ krsp_top.krsp <- function(con, year) {
       mutate(metric = "n_behaviours")
     # collars
     collars <- tbl(con, "trapping") %>%
-      filter_(~ radio == 1,
-              ~ !is.na(obs),
-              ~ obs != "") %>%
+      filter( radio == 1,
+               !is.na(obs),
+               obs != "") %>%
       rename_(observer = "obs")
     if (!missing(year)) {
       collars <- collars %>%
-        filter_(~ year(date) == year_arg)
+        filter( year(date) == year_arg)
     }
     collars <- collars %>%
       count_("observer") %>%
@@ -75,10 +70,10 @@ krsp_top.krsp <- function(con, year) {
   })
   # combine all metrics together
   top <- bind_rows(trapping, behaviour, collars) %>%
-    mutate_(observer = ~ toupper(observer)) %>%
+    mutate(observer =  toupper(observer)) %>%
     tidyr::spread_("metric", "n", fill = 0) %>%
-    filter_(~ grepl("^[A-Z]{2,3}$", observer)) %>%
-    select_("observer", "n_trapped", "n_collars", "n_behaviours") %>%
+    filter( grepl("^[A-Z]{2,3}$", observer)) %>%
+    select("observer", "n_trapped", "n_collars", "n_behaviours") %>%
     ungroup()
-  arrange_(top, ~ desc(n_trapped), ~ desc(n_collars), ~ desc(n_behaviours))
+  arrange(top, desc(n_trapped),  desc(n_collars),  desc(n_behaviours))
 }
