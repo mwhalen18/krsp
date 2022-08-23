@@ -5,4 +5,4 @@ test_that("krsp-collars() returns a data frame", {
     'list'
   )
 })
-dbDisconnect(con)
+DBI::dbDisconnect(con)

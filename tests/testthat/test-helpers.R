@@ -15,4 +15,4 @@ test_that("code_mast_years() works for dataframes", {
     'tbl_df'
   )
 })
-dbDisconnect(con)
+DBI::dbDisconnect(con)

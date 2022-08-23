@@ -73,4 +73,4 @@ test_that("cones_grids_years() returns single grid and single year", {
   })
 })
 
-dbDisconnect(con)
+DBI::dbDisconnect(con)

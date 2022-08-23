@@ -6,3 +6,4 @@ test_that("check_collars() returns a data frame", {
     'list'
   )
 })
+DBI::dbDisconnect(con)

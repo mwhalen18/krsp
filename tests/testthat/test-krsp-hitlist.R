@@ -4,5 +4,5 @@ test_that("krsp-hitlist() returns a tibble", {
     krsp_hitlist(con, 2019),
     'list'
   )
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 })
