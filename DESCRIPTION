@@ -3,6 +3,7 @@ Title: Working with the Kluane Red Squirrel Project Database
 Version: 0.0.2
 Authors@R: c(
   person("Matthew", "Strimas-Mackey", email="mstrimas@gmail.com", role = c("aut", "cre")),
+  person("Matthew", "Whalen", email = "matthew.whalen18@gmail.com", role = c("aut")),
   person("Andrew", "McAdam", email="amcadam@uoguelph.ca", role = c("aut", "cph"))
   )
 Maintainer: Matthew Strimas-Mackey <mstrimas@gmail.com>
