@@ -4,7 +4,7 @@
 \alias{krsp_colours}
 \title{Colour key}
 \usage{
-krsp_colours(con, grid, year)
+krsp_colours(con, grid, year = current_year())
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -15,12 +15,12 @@ krsp_colours(con, grid, year)
 }
 \value{
 A data frame allowing identification of squirrels by colours. In this
-  data frame there are three flags: \code{valid} indicates whether the
-  colours are valid (allowing for at most 2 colours per ear),
-  \code{duplicate} indicates whether that combination of colours is used on
-  multiple squirrels, and \code{standard} indicates whether a squirrel has
-  standard colouring, i.e. one colour in each ear and no mixing of wires,
-  pipes, and discs.
+data frame there are three flags: \code{valid} indicates whether the
+colours are valid (allowing for at most 2 colours per ear),
+\code{duplicate} indicates whether that combination of colours is used on
+multiple squirrels, and \code{standard} indicates whether a squirrel has
+standard colouring, i.e. one colour in each ear and no mixing of wires,
+pipes, and discs.
 }
 \description{
 Display a colour key based on the most recent trapping records for a given

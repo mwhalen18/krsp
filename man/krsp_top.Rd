@@ -13,7 +13,7 @@ krsp_top(con, year)
 }
 \value{
 A data frame of squirrelers and number of trapping records, behaviour
-  observations, and collars.
+observations, and collars.
 }
 \description{
 Generate a list of the top squirrelers based on a variety of metrics.

@@ -2,18 +2,9 @@
 % Please edit documentation in R/check-behaviour.r
 \name{check_behaviour}
 \alias{check_behaviour}
-\alias{check_behaviour_loc}
-\alias{check_behaviour_mode}
-\alias{check_behaviour_time}
 \title{Check records in behaviour table}
 \usage{
 check_behaviour(con, grid, year, observer)
-
-check_behaviour_loc(con, grid, year, observer)
-
-check_behaviour_mode(con, grid, year, observer)
-
-check_behaviour_time(con, grid, year, observer)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -40,13 +31,13 @@ functions outlined below.
 The following checks have been implemented:
 
 \itemize{
-  \item \code{check_behaviour_loc}: all locs should conform to the standard
-    format, e.g. A.1, 22.1, or -1.8.
-  \item \code{check_behaviour_mode}: the \code{mode} of the observation, i.e.
-    how it was taken, should never be empty.
-  \item \code{check_behaviour_time}: in general, behaviour observations
-    should all be taken between between 6am and 10pm, with the exception of
-    nest locs, which may be night locs.
+\item \code{check_behaviour_loc}: all locs should conform to the standard
+format, e.g. A.1, 22.1, or -1.8.
+\item \code{check_behaviour_mode}: the \code{mode} of the observation, i.e.
+how it was taken, should never be empty.
+\item \code{check_behaviour_time}: in general, behaviour observations
+should all be taken between between 6am and 10pm, with the exception of
+nest locs, which may be night locs.
 }
 }
 

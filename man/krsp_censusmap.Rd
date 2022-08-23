@@ -4,7 +4,7 @@
 \alias{krsp_censusmap}
 \title{Display a map of middens comparing this and previous census}
 \usage{
-krsp_censusmap(con, grid, year, census, data)
+krsp_censusmap(con, grid, year, census = c("august", "may"), data = FALSE)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -20,7 +20,7 @@ krsp_censusmap(con, grid, year, census, data)
 }
 \value{
 An interactive plot comparing censuses, or a data frame if
-  \code{data == TRUE}.
+\code{data == TRUE}.
 }
 \description{
 This function is to meant to be used to monitor progress towards completion

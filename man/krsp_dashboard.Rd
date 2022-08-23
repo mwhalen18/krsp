@@ -4,8 +4,13 @@
 \alias{krsp_dashboard}
 \title{Launch the Shiny Squirrels dashboard}
 \usage{
-krsp_dashboard(location, dbname = "krsp", host = "localhost",
-  username = "root", password = "")
+krsp_dashboard(
+  location,
+  dbname = "krsp",
+  host = "localhost",
+  username = "root",
+  password = ""
+)
 }
 \arguments{
 \item{location}{string; choose one of the predefined database connection

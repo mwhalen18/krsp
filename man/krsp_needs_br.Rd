@@ -4,7 +4,7 @@
 \alias{krsp_needs_br}
 \title{Identify squirrels without breeding status}
 \usage{
-krsp_needs_br(con, year)
+krsp_needs_br(con, year = current_year())
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -13,7 +13,7 @@ krsp_needs_br(con, year)
 }
 \value{
 A tbl of squirrels, including their IDs and identifying
-   information. Can be converted to a data.frame.
+information. Can be converted to a data.frame.
 }
 \description{
 Identify female squirrels who are missing a breeding status (\code{br} in the

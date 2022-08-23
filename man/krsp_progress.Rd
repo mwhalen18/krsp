@@ -4,7 +4,13 @@
 \alias{krsp_progress}
 \title{Display seasonal data collection progress}
 \usage{
-krsp_progress(con, grid, year, sex = c("F", "M", "Both"), data = FALSE)
+krsp_progress(
+  con,
+  grid,
+  year = current_year(),
+  sex = c("F", "M", "Both"),
+  data = FALSE
+)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -18,12 +24,12 @@ krsp_progress(con, grid, year, sex = c("F", "M", "Both"), data = FALSE)
 \item{data}{logical; if TRUE return data frame instead of plotting}
 }
 \value{
-Displays and returns a \code{ggvis} plot of seasonal workflow 
-  progress for all squirrels, unless \code{data} is TRUE, in which case a
-  data frame is returned and nothing is plotted.
+Displays and returns a \code{ggvis} plot of seasonal workflow
+progress for all squirrels, unless \code{data} is TRUE, in which case a
+data frame is returned and nothing is plotted.
 }
 \description{
-Display an interactive visualization of data collection progress for the 
+Display an interactive visualization of data collection progress for the
 season. All adult females and males caught in the given year are inlcuded
 provided their most recent trapping record has fate 1-3.
 }

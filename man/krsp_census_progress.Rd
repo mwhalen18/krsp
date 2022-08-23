@@ -4,7 +4,7 @@
 \alias{krsp_census_progress}
 \title{Display a table of progress towards census}
 \usage{
-krsp_census_progress(con, grid, year, census)
+krsp_census_progress(con, grid, year, census = c("august", "may"))
 }
 \arguments{
 \item{con}{Connection to KRSP database}

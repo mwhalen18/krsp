@@ -4,8 +4,16 @@
 \alias{krsp_rattlemap}
 \title{Map behaviour records on grid}
 \usage{
-krsp_rattlemap(con, grid, year, date_range, locx_range, locy_range, middens,
-  data)
+krsp_rattlemap(
+  con,
+  grid,
+  year,
+  date_range,
+  locx_range,
+  locy_range,
+  middens = c("none", "august", "may"),
+  data = FALSE
+)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -20,11 +28,11 @@ show records that are between these dates.}
 
 \item{locx_range}{vector of length 2 giving upper and lower bounds of x locs,
 either as character (e.g. \code{c("A", "H.5")}) or numeric (e.g.
-\code{5.5, 10}).}
+\verb{5.5, 10}).}
 
 \item{locy_range}{vector of length 2 giving upper and lower bounds of y locs,
 either as character (e.g. \code{c("5", "10.5")}) or numeric (e.g.
-\code{5, 10.5}).}
+\verb{5, 10.5}).}
 
 \item{middens}{character; whether to show middens from the August ("august")
 census, the May census ("may"), or not display middens at all ("none").}
@@ -33,8 +41,8 @@ census, the May census ("may"), or not display middens at all ("none").}
 }
 \value{
 Displays and returns a \code{ggvis} plot of rattle locations, unless
-  \code{data} is TRUE, in which case a data frame is returned and nothing is
-  plotted.
+\code{data} is TRUE, in which case a data frame is returned and nothing is
+plotted.
 }
 \description{
 Create an interative plot of rattle or feeding behaviour on given grid and in

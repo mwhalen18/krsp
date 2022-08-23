@@ -4,7 +4,7 @@
 \alias{krsp_collars}
 \title{Radio collar status}
 \usage{
-krsp_collars(con, grid, year)
+krsp_collars(con, grid, year = current_year())
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -19,7 +19,7 @@ A data frame of all squirrels with collars on.
 \description{
 Generate a list of all squirrels that currently have collars on. A squirrel
 is assumed to have a collar on if there is a record for a new radio collar (
-`radio = 1`), but no matching radio collar off record (`radio = 4`).
+\code{radio = 1}), but no matching radio collar off record (\code{radio = 4}).
 }
 \examples{
 \dontrun{

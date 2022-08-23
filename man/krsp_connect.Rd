@@ -4,8 +4,15 @@
 \alias{krsp_connect}
 \title{Connect to the krsp database}
 \usage{
-krsp_connect(dbname = "krsp", host = "localhost", port = 0L,
-  user = "root", password = "", group = NULL, ...)
+krsp_connect(
+  dbname = "krsp",
+  host = "localhost",
+  port = 0L,
+  user = "root",
+  password = "",
+  group = NULL,
+  ...
+)
 }
 \arguments{
 \item{dbname}{database name; defaults to \code{krsp}}
@@ -20,13 +27,13 @@ supplied.}
 
 \item{group}{character; my.cnf option group}
 
-\item{...}{Additional arguments passed on to \code{\link[dplyr]{src_mysql}}.}
+\item{...}{Additional arguments passed on to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 }
 \value{
 A connection to the krsp database for use with \code{dplyr}.
 }
 \description{
-\code{krsp_connect} is a wrapper for \code{\link[dplyr]{src_mysql}} that
+\code{krsp_connect} is a wrapper for \code{\link[DBI:dbConnect]{DBI::dbConnect()}} that
 connects to the KRSP database. By default, this function will connect to a
 local copy of the database as root user with no password. When connecting to
 a remote database, the host, username, and password must be supplied. This

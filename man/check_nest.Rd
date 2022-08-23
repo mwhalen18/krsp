@@ -2,30 +2,9 @@
 % Please edit documentation in R/check-nest.r
 \name{check_nest}
 \alias{check_nest}
-\alias{check_nest_loc}
-\alias{check_nest_n1loc}
-\alias{check_nest_n2loc}
-\alias{check_nest_weight}
-\alias{check_nest_dna}
-\alias{check_nest_notch}
-\alias{check_nest_grid}
 \title{Check records in litter and juvenile tables}
 \usage{
 check_nest(con, grid, year)
-
-check_nest_loc(con, grid, year)
-
-check_nest_n1loc(con, grid, year)
-
-check_nest_n2loc(con, grid, year)
-
-check_nest_weight(con, grid, year)
-
-check_nest_dna(con, grid, year)
-
-check_nest_notch(con, grid, year)
-
-check_nest_grid(con, grid, year)
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -49,26 +28,26 @@ with the specific functions outlined below.
 The following checks have been implemented:
 
 \itemize{
-  \item \code{check_nest_loc}: the locs in the litter table should be
-    reflos for the mother's midden, e.g. A.5, 22.0, or -1.5, and not the
-    locations of the nests.
-  \item \code{check_nest_n1loc}:  all locs should conform to the standard
-    format, e.g. A.1, 22.1, or -1.8.
-  \item \code{check_nest_n2loc}:  all locs should conform to the standard
-    format, e.g. A.1, 22.1, or -1.8.
-  \item \code{check_nest_dna}: DNA vial numbers should be composed of
-    the grid, followed by the 2 digit year, then 4 numbers, e.g. KL151234.
-    In addition, all juveniles should have 2 DNA vials, unless one of the
-    nests was missed or the squirrel wasn't present at nest 2.
-  \item \code{check_nest_weight}: highlight records with suspicious nest 1 or
-    nest 2 weights. In general, nest 1s should be between 7 and 25 grams
-    and nest 2s between 30 and 80 grams. Flagged juveniles may result from an
-    error or a late nest.
-  \item \code{check_nest_notch}: within a litter no two squirrels of the same
-    sex should have the same notch combination.
-  \item \code{check_nest_grid}: the grid associated with a litter should
-    match the mother's grid. Mis-matches can occur if the iPod used to enter
-    the litter is set to the wrong grid.
+\item \code{check_nest_loc}: the locs in the litter table should be
+reflos for the mother's midden, e.g. A.5, 22.0, or -1.5, and not the
+locations of the nests.
+\item \code{check_nest_n1loc}:  all locs should conform to the standard
+format, e.g. A.1, 22.1, or -1.8.
+\item \code{check_nest_n2loc}:  all locs should conform to the standard
+format, e.g. A.1, 22.1, or -1.8.
+\item \code{check_nest_dna}: DNA vial numbers should be composed of
+the grid, followed by the 2 digit year, then 4 numbers, e.g. KL151234.
+In addition, all juveniles should have 2 DNA vials, unless one of the
+nests was missed or the squirrel wasn't present at nest 2.
+\item \code{check_nest_weight}: highlight records with suspicious nest 1 or
+nest 2 weights. In general, nest 1s should be between 7 and 25 grams
+and nest 2s between 30 and 80 grams. Flagged juveniles may result from an
+error or a late nest.
+\item \code{check_nest_notch}: within a litter no two squirrels of the same
+sex should have the same notch combination.
+\item \code{check_nest_grid}: the grid associated with a litter should
+match the mother's grid. Mis-matches can occur if the iPod used to enter
+the litter is set to the wrong grid.
 }
 }
 

@@ -15,7 +15,7 @@ A connection to the krsp database for use with \code{dplyr}.
 \description{
 The \code{pool} package is designed for managing database connectinos in
 Shiny apps when multiple users may be creating connections to the database
-simultaneously. This wrapper function for \code{\link[pool]{src_pool}}
+simultaneously. This wrapper function for \code{pool::src_pool()}
 returns a \code{krsp} database connection object from a pool.
 }
 \examples{

@@ -4,7 +4,7 @@
 \alias{krsp_hitlist}
 \title{List last year's breeders by parturition date}
 \usage{
-krsp_hitlist(con, year)
+krsp_hitlist(con, year = current_year())
 }
 \arguments{
 \item{con}{Connection to KRSP database}
@@ -14,8 +14,8 @@ breeders from 2015 will be listed.}
 }
 \value{
 A tbl of all female squirrels from previous August's census,
-   including location, in descending order of parturition date. Can be
-   converted to a data.frame.
+including location, in descending order of parturition date. Can be
+converted to a data.frame.
 }
 \description{
 List all female squirrel from August census of previous year, including

@@ -3,7 +3,6 @@
 \docType{package}
 \name{krsp}
 \alias{krsp}
-\alias{krsp-package}
 \title{krsp: Working with the Kluane Red Squirrel Project Database}
 \description{
 This package is designed to help users bring data from the KRSP database into
