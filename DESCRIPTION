@@ -10,12 +10,12 @@ Description: This package is designed to help user bring data from the KRSP
     database into R. In addition, common database queries are standardized as R
     functions to ensure consistency.
 Depends:
-    R (>= 3.1.2),
-    dplyr (>= 0.7.1)
+    R (>= 3.2),
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.2
 Imports: assertthat,
+    dplyr,
     ggvis,
     DBI,
     RMySQL,
@@ -23,13 +23,20 @@ Imports: assertthat,
     lazyeval,
     DT,
     htmlwidgets,
+    lubridate,
     tidyr,
     stringr,
     shiny,
     dbplyr
 URL: https://github.com/mstrimas/krsp
 BugReports: https://github.com/mstrimas/krsp/issues
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
-    pool (>= 0.1.0)
+    kinship2,
+    pool (>= 0.1.0),
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
+Encoding: UTF-8
