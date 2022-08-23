@@ -30,3 +30,7 @@ For a full demonstation of the functions in this package consult the vignette.
 ```{r vignette, eval=F}
 browseVignettes("krsp")
 ```
+
+### Changelog
+
+  - Aug 2022: Updates to all functions -- connection is now a wrapper around `DBI::dbConnect` rather than `dbplyr::src_dbi` which has been deprecated since 2019. Some additional helper functions added and infrastructure was added for future expansion.
