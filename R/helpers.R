@@ -4,7 +4,7 @@
 #' @param .gridCol a column to extract grid names from. Can accept standard and non-standard evaluated column names
 #' @param .yearCol a column to extract years from. Can accept standard and non standard evaluated column names
 #' @details The output of `code_mast_years()` will contain columns 'mast', 'Exp', and 'EXP_label'
-#' @Value Returns a `data.frame` or `tbl_df` object passed as an argument as `.tbl`
+#' Returns a `data.frame` or `tbl_df` object passed as an argument as `.tbl`
 #' @examples
 #' \dontrun {
 #' con <- krsp_connect(group = 'krsp-aws')
