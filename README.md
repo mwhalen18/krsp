@@ -27,7 +27,14 @@ browseVignettes("krsp")
 
 ### Changelog
 
--   Aug 2022: Updates to all functions – connection is now a wrapper
-    around `DBI::dbConnect` rather than `dbplyr::src_dbi` which has been
-    deprecated since 2019. Some additional helper functions added and
-    infrastructure was added for future expansion.
+-   Aug 2022:
+    -   Updates to all functions – connection is now a wrapper around
+        `DBI::dbConnect` rather than `dbplyr::src_dbi` which has been
+        deprecated since 2019.
+    -   Some additional helper functions added and infrastructure was
+        added for future expansion.
+    -   All functions now support non-standard evaluation for use in
+        tidy pipelines.
+    -   Changes to package dependencies to avoid breakage across
+        versions
+    -   Other quality of life improvements
